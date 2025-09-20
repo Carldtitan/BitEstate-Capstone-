@@ -1,6 +1,3 @@
-# BitEstate-Capstone-
-Capstone project repo for BitEstate MVP
-
 # Bit Estate Capstone Project
 
 This repository contains my Capstone project exploring how blockchain can improve safety and transparency in real estate transactions in developing nations.
@@ -23,7 +20,7 @@ Planned MVP components include:
 - **Property records with mock data**  
 - **Blockchain testnet logging**
 
-⚠️ *Scope is not yet fully refined. I will finalize details by the end of Week 2 after checking feasibility and resources.*
+⚠️ *Scope is not yet fully refined. I will finalize details by the end of Week 3 after checking feasibility and resources.*
 
 ---
 
