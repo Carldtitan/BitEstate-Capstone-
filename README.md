@@ -24,7 +24,7 @@ Planned MVP components include:
 
 ---
 
-## 📂 Repo Structure (planned)
+## 📂 Repo Structure (Done)
 - `docs/` → planning docs, project brief drafts  
 - `src/` → source code  
 - `mock_data/` → property records  
