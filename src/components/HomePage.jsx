@@ -4,7 +4,8 @@ import listings from "../data/listings";
 import { getListing } from "../contract.js";
 
 export default function HomePage() {
-  const featured = listings.slice(0, 3);
+  // Keep the hero simple and reduce technical jargon
+  const featured = listings.slice(0, 2);
   const [statusMap, setStatusMap] = useState({});
 
   useEffect(() => {
@@ -27,32 +28,32 @@ export default function HomePage() {
     <div className="layout">
       <section className="hero">
         <div className="hero-card">
-          <p className="badge">Blockchain-backed real estate</p>
-          <h1 className="hero-title">Verify, buy, and sell property with confidence.</h1>
+          <p className="badge">Trusted homes, verified titles</p>
+          <h1 className="hero-title">Find a home you love and move fast.</h1>
           <p className="hero-subtitle">
-            BitEstate blends blockchain proofs with document hashing so buyers can verify title
-            documents, browse trusted listings, and purchase on-chain.
+            Browse move-in ready homes, review verified title info, and complete purchases with a few clicks.
+            No jargon—just clear listings, real owners, and simple steps.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link to="/verify" className="btn-primary btn">
-              Verify a title
+              Verify a document
             </Link>
             <Link to="/listings" className="btn">
-              Explore verified listings
+              Explore homes
             </Link>
           </div>
           <div className="stat-band">
             <div className="stat">
-              <span className="muted">Verified listings</span>
-              <strong>50+</strong>
+              <span className="muted">Trusted sellers</span>
+              <strong>Verified owners</strong>
             </div>
             <div className="stat">
-              <span className="muted">On-chain payments</span>
-              <strong>0.0000001 ETH</strong>
+              <span className="muted">Title ready</span>
+              <strong>Pre-checked docs</strong>
             </div>
             <div className="stat">
-              <span className="muted">Document matches</span>
-              <strong>SHA-256 exact</strong>
+              <span className="muted">Quick closing</span>
+              <strong>Guided steps</strong>
             </div>
           </div>
         </div>
@@ -63,7 +64,7 @@ export default function HomePage() {
             style={{ width: "100%", borderRadius: "14px" }}
           />
           <p className="muted" style={{ marginTop: "10px" }}>
-            Modern, Airbnb-inspired cards, trust badges, and on-chain verification flows.
+            Bright, modern listings with simple verification and purchase flows.
           </p>
         </div>
       </section>
@@ -71,8 +72,8 @@ export default function HomePage() {
       <section className="section">
         <div className="section-header">
           <div>
-            <h3 style={{ margin: 0 }}>Featured verified listings</h3>
-            <p className="muted">Ready to purchase on-chain</p>
+            <h3 style={{ margin: 0 }}>Featured homes</h3>
+            <p className="muted">Title-checked and ready for the next owner</p>
           </div>
           <Link to="/listings" className="btn">
             View all
@@ -89,8 +90,8 @@ export default function HomePage() {
                     {statusMap[home.id]?.sold
                       ? "Sold"
                       : statusMap[home.id]?.exists
-                      ? "On-chain"
-                      : "Not on-chain"}
+                      ? "Verified"
+                      : "Pending"}
                   </span>
                 </div>
                 <p className="muted" style={{ margin: 0 }}>
@@ -99,7 +100,9 @@ export default function HomePage() {
                 <p style={{ margin: "4px 0 0" }}>
                   ${home.priceUsd.toLocaleString()} · {home.beds} beds · {home.baths} baths
                 </p>
-                <span className="pill">Price: 0.0000001 ETH</span>
+                <span className="pill">
+                  {statusMap[home.id]?.exists ? "Verified title" : "Awaiting verification"}
+                </span>
               </div>
             </div>
           ))}
