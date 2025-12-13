@@ -450,13 +450,20 @@ export default function ListingsPage() {
                 <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                   <span className="pill">{cowriesPerListing} Cowries</span>
                   <span className="pill">Price: 0.0000001 ETH</span>
-                  <span className="muted">Owner: {home.owner || "Unknown"}</span>
+                  <span className="muted">
+                    Owner: {home.owner || "Unknown"} {isOwner ? "(you)" : ""}
+                  </span>
                 </div>
                 {home.docHash && !hashFound && isAdmin && (
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "6px" }}>
                     <span className="pill" style={{ background: "#1e293b" }}>
                       Admin must register missing hashes
                     </span>
+                  </div>
+                )}
+                {isOwner && (
+                  <div className="pill" style={{ background: "#0f172a", borderColor: "#22d3ee", color: "#22d3ee" }}>
+                    You own this listing
                   </div>
                 )}
                 <button
@@ -467,6 +474,8 @@ export default function ListingsPage() {
                 >
                   {home.id && sold
                     ? "Sold"
+                    : isOwner
+                    ? "You're the owner"
                     : canBuy
                     ? isBuying
                       ? "Purchasing..."
