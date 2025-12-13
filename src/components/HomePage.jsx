@@ -31,8 +31,8 @@ export default function HomePage() {
           <p className="badge">Trusted homes, verified titles</p>
           <h1 className="hero-title">Find a home you love and move fast.</h1>
           <p className="hero-subtitle">
-            Browse move-in ready homes, review verified title info, and complete purchases with a few clicks.
-            No jargon—just clear listings, real owners, and simple steps.
+            Browse ready homes, see clear details, and buy in a few steps. We keep the paperwork simple so you can
+            focus on the move.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link to="/verify" className="btn-primary btn">
@@ -73,7 +73,7 @@ export default function HomePage() {
         <div className="section-header">
           <div>
             <h3 style={{ margin: 0 }}>Featured homes</h3>
-            <p className="muted">Title-checked and ready for the next owner</p>
+            <p className="muted">Pre-checked titles and ready for the next owner</p>
           </div>
           <Link to="/listings" className="btn">
             View all
