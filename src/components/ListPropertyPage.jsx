@@ -6,6 +6,7 @@ import { addDoc, collection, serverTimestamp, query, where, getDocs, limit } fro
 import { useAuth } from "../context/AuthContext";
 import { buildRecordHash } from "../utils/recordHash";
 import { useWallet } from "../context/WalletContext";
+import { copyToClipboard } from "../utils/clipboard";
 
 export default function ListPropertyPage() {
   const [form, setForm] = useState({
@@ -28,6 +29,7 @@ export default function ListPropertyPage() {
   const [hash, setHash] = useState("");
   const [canRegister, setCanRegister] = useState(false);
   const [pending, setPending] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState("");
   const { isAdmin } = useAuth();
   const { walletAddress, connectWallet, networkOk, walletError } = useWallet();
 
@@ -288,6 +290,22 @@ export default function ListPropertyPage() {
         {hash && (
           <div className="status" style={{ marginTop: "8px", wordBreak: "break-all" }}>
             Document hash: {hash}
+            <button
+              className="btn"
+              style={{ marginLeft: "8px", padding: "4px 8px", fontSize: "12px" }}
+              onClick={() =>
+                copyToClipboard(
+                  hash,
+                  () => {
+                    setCopyFeedback("hash");
+                    setTimeout(() => setCopyFeedback(""), 2000);
+                  },
+                  () => setStatus("Failed to copy")
+                )
+              }
+            >
+              {copyFeedback === "hash" ? "✓ Copied" : "Copy"}
+            </button>
           </div>
         )}
       </form>

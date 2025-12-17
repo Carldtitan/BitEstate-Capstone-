@@ -2,6 +2,7 @@ import { useState } from "react";
 import { generateHash } from "../hash";
 import { verifyHash } from "../contract.js";
 import { useWallet } from "../context/WalletContext";
+import { copyToClipboard } from "../utils/clipboard";
 
 export default function VerifyPage() {
   const [referenceFile, setReferenceFile] = useState(null);
@@ -9,6 +10,7 @@ export default function VerifyPage() {
   const [status, setStatus] = useState("");
   const [hashes, setHashes] = useState({ reference: "", candidate: "" });
   const [chainStatus, setChainStatus] = useState("");
+  const [copyFeedback, setCopyFeedback] = useState("");
   const { walletAddress, connectWallet } = useWallet();
 
   const handleVerify = async () => {
@@ -84,19 +86,56 @@ export default function VerifyPage() {
               <tr>
                 <th>File</th>
                 <th>SHA-256 hash</th>
+                <th style={{ width: "60px" }}>Action</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Reference</td>
-                <td className="muted" style={{ wordBreak: "break-all" }}>
+                <td className="muted" style={{ wordBreak: "break-all", fontSize: "12px" }}>
                   {hashes.reference}
+                </td>
+                <td>
+                  <button
+                    className="btn"
+                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                    onClick={() =>
+                      copyToClipboard(
+                        hashes.reference,
+                        () => {
+                          setCopyFeedback("reference");
+                          setTimeout(() => setCopyFeedback(""), 2000);
+                        },
+                        () => setStatus("Failed to copy")
+                      )
+                    }
+                  >
+                    {copyFeedback === "reference" ? "✓" : "Copy"}
+                  </button>
                 </td>
               </tr>
               <tr>
                 <td>Candidate</td>
-                <td className="muted" style={{ wordBreak: "break-all" }}>
+                <td className="muted" style={{ wordBreak: "break-all", fontSize: "12px" }}>
                   {hashes.candidate}
+                </td>
+                <td>
+                  <button
+                    className="btn"
+                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                    onClick={() =>
+                      copyToClipboard(
+                        hashes.candidate,
+                        () => {
+                          setCopyFeedback("candidate");
+                          setTimeout(() => setCopyFeedback(""), 2000);
+                        },
+                        () => setStatus("Failed to copy")
+                      )
+                    }
+                  >
+                    {copyFeedback === "candidate" ? "✓" : "Copy"}
+                  </button>
                 </td>
               </tr>
             </tbody>
