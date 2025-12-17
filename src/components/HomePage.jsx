@@ -107,6 +107,101 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Features Section */}
+      <section className="section">
+        <div className="section-header">
+          <div>
+            <h2 style={{ margin: 0 }}>Why choose BitEstate?</h2>
+            <p className="muted" style={{ marginTop: "8px" }}>
+              Industry-leading security and speed for real estate transactions
+            </p>
+          </div>
+        </div>
+        <div className="grid">
+          <div className="card feature-card">
+            <div className="feature-icon">🔐</div>
+            <h4>Blockchain Security</h4>
+            <p>Immutable records prevent title fraud and disputes</p>
+          </div>
+          <div className="card feature-card">
+            <div className="feature-icon">⚡</div>
+            <h4>Lightning Fast</h4>
+            <p>Complete transactions in minutes, not weeks</p>
+          </div>
+          <div className="card feature-card">
+            <div className="feature-icon">✓</div>
+            <h4>Verified Documents</h4>
+            <p>SHA-256 hashes prove authenticity and integrity</p>
+          </div>
+          <div className="card feature-card">
+            <div className="feature-icon">💰</div>
+            <h4>Lower Costs</h4>
+            <p>Skip intermediaries and reduce transaction fees</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="section">
+        <div className="section-header">
+          <div>
+            <h2 style={{ margin: 0 }}>Trusted by property owners</h2>
+            <p className="muted" style={{ marginTop: "8px" }}>
+              Join thousands of users securing their real estate with blockchain
+            </p>
+          </div>
+        </div>
+        <div className="testimonials">
+          <div className="testimonial-card">
+            <div className="stars">★★★★★</div>
+            <p>"BitEstate made selling my property incredibly smooth. The blockchain verification gave me peace of mind."</p>
+            <div className="testimonial-author">
+              <div className="avatar">A</div>
+              <div>
+                <strong>Amina</strong>
+                <small>Property Seller</small>
+              </div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <div className="stars">★★★★★</div>
+            <p>"As a buyer, I appreciate the transparency. No hidden issues with verified documents on the blockchain."</p>
+            <div className="testimonial-author">
+              <div className="avatar">C</div>
+              <div>
+                <strong>Carlos</strong>
+                <small>Property Buyer</small>
+              </div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <div className="stars">★★★★★</div>
+            <p>"The document verification feature saved us from a potential fraud. Highly recommended!"</p>
+            <div className="testimonial-author">
+              <div className="avatar">S</div>
+              <div>
+                <strong>Sylvia</strong>
+                <small>Real Estate Agent</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="section cta-section">
+        <h2>Ready to transform your real estate?</h2>
+        <p>Join BitEstate today and experience blockchain-powered property transactions</p>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+          <Link to="/verify" className="btn-primary btn">
+            Start Verifying →
+          </Link>
+          <Link to="/listings" className="btn">
+            Browse Listings
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
