@@ -4,7 +4,8 @@
   "homepage": "https://Carldtitan.github.io/BitEstate-Capstone-/",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html --public-url ./",
+    "build": "parcel build index.html --public-url ./ && npm run copy-public",
+    "copy-public": "node -e \"require('fs').cpSync('public', 'dist', { recursive: true })\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "lint": "echo \"add eslint here\"",
