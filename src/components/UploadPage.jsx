@@ -7,6 +7,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useWallet } from "../context/WalletContext";
 import { validators, sanitizeText } from "../utils/validation";
 import { copyToClipboard } from "../utils/clipboard";
+import Modal from "./Modal";
 
 export default function UploadPage() {
   const [form, setForm] = useState({
@@ -32,6 +33,7 @@ export default function UploadPage() {
   const [metadataHash, setMetadataHash] = useState("");
   const [tx, setTx] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
+  const [modal, setModal] = useState({ open: false, title: "", message: "", type: "error" });
   const { walletAddress, connectWallet, networkOk, walletError } = useWallet();
 
   const validateField = (name, value) => {
@@ -157,7 +159,14 @@ export default function UploadPage() {
         createdAt: serverTimestamp(),
       });
     } catch (err) {
-      setStatus(err.message || "Failed to submit hash");
+      console.error(err);
+      const raw =
+        err?.reason || err?.error?.message || err?.data?.message || err?.message || String(err);
+      let short = raw;
+      const m = /revert(?:ed)?:?\s*(.*)/i.exec(raw);
+      if (m && m[1]) short = m[1];
+      setModal({ open: true, title: "Upload Error", message: raw, type: "error" });
+      setStatus("Failed to submit hash");
     }
   };
 
@@ -355,6 +364,13 @@ export default function UploadPage() {
           Tx: {tx}
         </div>
       )}
+      <Modal
+        open={modal.open}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={() => setModal((m) => ({ ...m, open: false }))}
+      />
     </div>
   );
 }

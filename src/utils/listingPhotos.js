@@ -47,16 +47,33 @@ export const LISTING_PHOTOS = [
  * Same listing ID always returns same photo, different IDs get different photos
  */
 export function getRandomListingPhoto(listingId) {
-  // Simple but effective hash: multiply by prime, modulo by array length
-  // This distributes different IDs across different photos
-  const id = typeof listingId === 'number' ? listingId : parseInt(listingId) || 0;
-  
-  // Multiply by a large prime to spread values across the range
-  const hashed = (id * 2654435761) >>> 0; // >>> 0 makes it unsigned
-  
-  // Use modulo to get index in range [0, LISTING_PHOTOS.length)
-  const index = hashed % LISTING_PHOTOS.length;
-  
+  // Support numeric IDs and string IDs (e.g. Firestore doc ids)
+  // For strings we compute a deterministic 32-bit hash (FNV-1a) then mix with a prime
+  if (listingId == null) return getRandomPhoto();
+
+  const toUint32FromString = (s) => {
+    let h = 2166136261; // FNV offset basis
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+
+  let idNum;
+  if (typeof listingId === 'number' && Number.isFinite(listingId)) {
+    idNum = listingId >>> 0;
+  } else if (typeof listingId === 'string' && /^[0-9]+$/.test(listingId)) {
+    // numeric string
+    idNum = parseInt(listingId, 10) >>> 0;
+  } else {
+    // fallback: hash the string deterministically
+    idNum = toUint32FromString(String(listingId));
+  }
+
+  // Multiply by a large prime (Knuth's multiplicative constant) and take unsigned
+  const mixed = Math.imul(idNum, 2654435761) >>> 0;
+  const index = mixed % LISTING_PHOTOS.length;
   return LISTING_PHOTOS[index];
 }
 
