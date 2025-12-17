@@ -9,10 +9,10 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  appId: process.env.FIREBASE_APP_ID,
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDYrdy-ALKekM0fC6UQ2JuAXgOrpMMmxZ0",
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "bitestate-a77a3.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "bitestate-a77a3",
+  appId: process.env.FIREBASE_APP_ID || "1:403297736948:web:0bf79bff07e4a8e3e626a1",
 };
 
 const adminEmails = (process.env.ADMIN_EMAILS || "")
@@ -25,19 +25,11 @@ let auth;
 
 function ensureFirebase() {
   if (!app) {
-    // Check if Firebase config is properly set
-    if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-      console.warn(
-        "Firebase not configured via .env. Falling back to local demo auth. " +
-        "Set FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_APP_ID to enable."
-      );
-      return null;
-    }
     try {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
     } catch (err) {
-      console.warn("Firebase initialization failed:", err.message);
+      console.warn("Firebase initialization error (will use demo mode):", err.message);
       return null;
     }
   }
@@ -54,20 +46,26 @@ export function AuthProvider({ children }) {
   const provider = useMemo(() => new GoogleAuthProvider(), []);
 
   useEffect(() => {
-    const auth = ensureFirebase();
-    if (!auth) {
+    try {
+      const auth = ensureFirebase();
+      if (!auth) {
+        setFirebaseReady(false);
+        setLoading(false);
+        return;
+      }
+      setFirebaseReady(true);
+      const unsubscribe = onAuthStateChanged(auth, (u) => {
+        setUser(u);
+        const email = u?.email?.toLowerCase();
+        setIsAdmin(email ? adminEmails.includes(email) : false);
+        setLoading(false);
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.warn("Firebase auth setup failed, using demo mode:", err.message);
       setFirebaseReady(false);
       setLoading(false);
-      return;
     }
-    setFirebaseReady(true);
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      const email = u?.email?.toLowerCase();
-      setIsAdmin(email ? adminEmails.includes(email) : false);
-      setLoading(false);
-    });
-    return unsubscribe;
   }, []);
 
   const login = async () => {

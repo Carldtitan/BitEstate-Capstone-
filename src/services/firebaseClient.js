@@ -2,19 +2,12 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  appId: process.env.FIREBASE_APP_ID,
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDYrdy-ALKekM0fC6UQ2JuAXgOrpMMmxZ0",
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "bitestate-a77a3.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "bitestate-a77a3",
+  appId: process.env.FIREBASE_APP_ID || "1:403297736948:web:0bf79bff07e4a8e3e626a1",
 };
 
-// Only initialize if we have required config
-let app;
-if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-  app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-} else {
-  console.warn("Firebase config incomplete. Firestore will not work. Set all FIREBASE_* env vars.");
-  app = getApps().length ? getApps()[0] : initializeApp({ projectId: "dummy" });
-}
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
