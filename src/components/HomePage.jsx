@@ -3,13 +3,53 @@ import { useEffect, useState } from "react";
 import listings from "../data/listings";
 import { getListing } from "../contract.js";
 import { getRandomListingPhoto } from "../utils/listingPhotos";
+import { db } from "../services/firebaseClient";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function HomePage() {
-  // Keep the hero simple and reduce technical jargon
-  const featured = listings.slice(0, 2);
   const [statusMap, setStatusMap] = useState({});
+  const [allListings, setAllListings] = useState([]);
+  const [featured, setFeatured] = useState([]);
 
+  // Load custom listings from Firestore
   useEffect(() => {
+    const loadCustomListings = async () => {
+      try {
+        const snap = await getDocs(collection(db, "listings"));
+        const customListings = snap.docs.map((d) => {
+          const data = d.data();
+          const numId = Number(data.contractId ?? data.id);
+          const resolvedId = Number.isFinite(numId) ? numId : d.id;
+          const asStr = data.image ? String(data.image).trim() : "";
+          const isLocalListingPhoto = asStr.startsWith("/listing-photos/");
+          const looksLikeImageUrl = /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr) || /^https?:\/\/.+\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr);
+          const imgFromDb = isLocalListingPhoto || looksLikeImageUrl ? asStr : null;
+          return {
+            id: resolvedId,
+            docId: d.id,
+            image: imgFromDb || getRandomListingPhoto(resolvedId),
+            fromDb: true,
+            ...data,
+          };
+        });
+        // Merge custom listings with mock data, avoiding duplicates
+        const mergedListings = [
+          ...customListings,
+          ...listings.filter((mockListing) => !customListings.some((custom) => custom.id === mockListing.id)),
+        ];
+        setAllListings(mergedListings);
+        setFeatured(mergedListings.slice(0, 2));
+      } catch (err) {
+        console.warn("Failed to load custom listings", err);
+        setFeatured(listings.slice(0, 2));
+      }
+    };
+    loadCustomListings();
+  }, []);
+
+  // Load on-chain status for featured listings
+  useEffect(() => {
+    if (featured.length === 0) return;
     const load = async () => {
       try {
         const results = await Promise.all(featured.map((l) => getListing(l.id)));
@@ -23,7 +63,7 @@ export default function HomePage() {
       }
     };
     load();
-  }, []);
+  }, [featured]);
 
   return (
     <div className="layout">
