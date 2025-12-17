@@ -188,7 +188,7 @@ h4 {
   border-bottom: 1px solid var(--border);
   max-height: calc(100vh - 60px);
   overflow-y: auto;
-  z-index: 999;
+  z-index: 1001;
   box-shadow: var(--shadow);
   animation: slideIn 0.2s ease;
 }
@@ -248,12 +248,12 @@ h4 {
 
 .navbar-overlay {
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  z-index: 1000;
   animation: fadeIn 0.2s ease;
 }
 
