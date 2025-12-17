@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import listings from "../data/listings";
 import { getListing } from "../contract.js";
+import { getRandomListingPhoto } from "../utils/listingPhotos";
 
 export default function HomePage() {
   // Keep the hero simple and reduce technical jargon
@@ -81,7 +82,7 @@ export default function HomePage() {
         <div className="grid">
           {featured.map((home) => (
             <div key={home.id} className="card">
-              <img src={home.image} alt={home.title} />
+              <img src={home.image || getRandomListingPhoto(home.id)} alt={home.title} />
               <div className="card-body">
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
                   <h4 style={{ margin: 0 }}>{home.title}</h4>
