@@ -3,12 +3,11 @@ import listingsData from "../data/listings";
 import { purchaseListing, PRICE_WEI, getListing, verifyHash } from "../contract.js";
 import { useWallet } from "../context/WalletContext";
 import { useAuth } from "../context/AuthContext";
+import { getRandomListingPhoto } from "../utils/listingPhotos";
 import { db } from "../services/firebaseClient";
 import { collection, getDocs, deleteDoc, doc, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
 export default function ListingsPage() {
-  const defaultImage =
-    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80";
   const { isAdmin } = useAuth();
   const { walletAddress, networkOk, connectWallet, walletError } = useWallet();
   const ITEMS_PER_PAGE = 20;
@@ -57,7 +56,7 @@ export default function ListingsPage() {
           return {
             id: resolvedId,
             docId: d.id,
-            image: data.image || defaultImage,
+            image: data.image || getRandomListingPhoto(resolvedId),
             ...data,
           };
         });
@@ -447,7 +446,7 @@ export default function ListingsPage() {
           const canBuy = typeof home.id === "number" && verified && !sold && !isOwner;
           return (
             <div key={hashKey} className="card">
-              <img src={home.image || defaultImage} alt={home.title} loading="lazy" />
+              <img src={home.image || getRandomListingPhoto(home.id)} alt={home.title} loading="lazy" />
               <div className="card-body">
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
                   <h4 style={{ margin: 0 }}>{home.title}</h4>

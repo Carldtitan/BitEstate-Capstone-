@@ -31,6 +31,98 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(45, 212, 191, 0.5);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -283,6 +375,23 @@ h4 {
   transition: all 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(45, 212, 191, 0.1);
+  transition: left 0.3s ease;
+}
+
+.btn:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .btn:hover:not(:disabled) {
@@ -335,6 +444,7 @@ button:disabled,
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: clamp(24px, 5vw, 48px);
   align-items: center;
+  animation: fadeIn 0.8s ease-out;
 }
 
 .hero-card {
@@ -343,12 +453,25 @@ button:disabled,
   border-radius: 20px;
   padding: clamp(20px, 4vw, 32px);
   box-shadow: var(--shadow);
+  animation: slideUp 0.6s ease-out;
+  transition: all 0.3s ease;
+}
+
+.hero-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .hero-card img {
   border-radius: 16px;
   width: 100%;
   height: auto;
+  transition: transform 0.4s ease;
+}
+
+.hero-card:hover img {
+  transform: scale(1.05);
 }
 
 .badge {
@@ -362,6 +485,7 @@ button:disabled,
   font-weight: 600;
   font-size: 12px;
   margin-bottom: 8px;
+  animation: slideIn 0.5s ease-out;
 }
 
 .hero-title {
@@ -369,6 +493,7 @@ button:disabled,
   line-height: 1.15;
   margin: 0 0 16px;
   color: var(--text);
+  animation: slideDown 0.6s ease-out 0.1s backwards;
 }
 
 .hero-subtitle {
@@ -376,6 +501,7 @@ button:disabled,
   font-size: clamp(14px, 2vw, 18px);
   margin-bottom: 24px;
   line-height: 1.7;
+  animation: slideDown 0.6s ease-out 0.2s backwards;
 }
 
 .stat-band {
@@ -447,10 +573,19 @@ button:disabled,
   flex-direction: column;
   transition: all 0.3s ease;
   height: 100%;
+  animation: slideUp 0.5s ease-out backwards;
+  position: relative;
 }
 
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
+.card:nth-child(n+6) { animation-delay: 0.3s; }
+
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow);
   border-color: var(--accent);
 }
@@ -459,6 +594,12 @@ button:disabled,
   width: 100%;
   height: 200px;
   object-fit: cover;
+  transition: transform 0.4s ease;
+  position: relative;
+}
+
+.card:hover img {
+  transform: scale(1.1);
 }
 
 .card-body {
@@ -503,7 +644,8 @@ button:disabled,
   color: var(--text);
   font-family: "Inter", sans-serif;
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out;
 }
 
 .input:focus,
@@ -512,6 +654,17 @@ button:disabled,
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+  transform: translateY(-2px);
+}
+
+.input::placeholder {
+  color: var(--muted);
+  transition: color 0.3s ease;
+}
+
+.input:focus::placeholder {
+  color: var(--muted);
+  opacity: 0.5;
 }
 
 .textarea {
