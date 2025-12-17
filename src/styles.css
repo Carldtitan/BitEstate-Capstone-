@@ -127,6 +127,150 @@ h4 {
   flex: 1;
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wallet-widget {
+  position: relative;
+}
+
+.wallet-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 4px;
+  min-width: 120px;
+  box-shadow: var(--shadow);
+  z-index: 1001;
+}
+
+.wallet-popup div {
+  padding: 4px 0;
+  font-weight: 500;
+}
+
+.user-btn {
+  font-weight: 600;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.hamburger:hover span {
+  background: var(--accent);
+}
+
+.navbar-menu {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: min(100%, 300px);
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  z-index: 999;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--text);
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: rgba(45, 212, 191, 0.08);
+  color: var(--accent);
+  padding-left: 20px;
+}
+
+.menu-item.admin {
+  color: #fbbf24;
+}
+
+.menu-item.logout {
+  color: #f87171;
+}
+
+.menu-item.logout:hover {
+  background: rgba(248, 113, 113, 0.1);
+  color: #fca5a5;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.navbar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .btn {
   padding: 8px 16px;
   border-radius: 10px;
@@ -447,6 +591,11 @@ button:disabled,
 
   .nav-links {
     gap: 8px;
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
   }
 
   .pill {
@@ -506,29 +655,29 @@ button:disabled,
   }
 
   .navbar {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 8px;
     padding: 10px 12px;
   }
 
   .brand {
-    justify-content: center;
+    justify-content: flex-start;
     font-size: 15px;
   }
 
   .nav-links {
-    width: 100%;
-    justify-content: center;
-    flex-direction: row;
-    gap: 6px;
-    flex-wrap: wrap;
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
   }
 
   .btn {
     padding: 8px 10px;
     font-size: 12px;
-    flex: 0 0 auto;
   }
 
   .pill {
