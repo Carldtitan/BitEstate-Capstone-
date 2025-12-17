@@ -1,44 +1,40 @@
 /**
  * Get a random listing photo
- * Photos are imported to ensure Parcel bundles them correctly
+ * Use public CDN images for reliability across environments (localhost, Vercel, etc.)
  */
 
-// Import all photos
-import photo1 from '../assets/listing-photos/aubrey-odom-ITzfgP77DTg-unsplash.jpg';
-import photo2 from '../assets/listing-photos/austin-Jmi3nWiILOc-unsplash.jpg';
-import photo3 from '../assets/listing-photos/brett-jordan-5x_JYiq5PHk-unsplash.jpg';
-import photo4 from '../assets/listing-photos/dan-begel-cmZfiElLkO8-unsplash.jpg';
-import photo5 from '../assets/listing-photos/devon-mackay-2TqK32k2ZCc-unsplash.jpg';
-import photo6 from '../assets/listing-photos/devon-mackay-fhU7X34rCAE-unsplash.jpg';
-import photo7 from '../assets/listing-photos/dillon-kydd-2keCPb73aQY-unsplash.jpg';
-import photo8 from '../assets/listing-photos/dillon-kydd-XGvwt544g8k-unsplash.jpg';
-import photo9 from '../assets/listing-photos/jason-briscoe-UV81E0oXXWQ-unsplash.jpg';
-import photo10 from '../assets/listing-photos/julia-rodriguez-s7Ys6yORjFI-unsplash.jpg';
-import photo11 from '../assets/listing-photos/karina-g-O4G2VR9Leb0-unsplash.jpg';
-import photo12 from '../assets/listing-photos/kelvin-taylor-cx1xEBnKhf8-unsplash.jpg';
-import photo13 from '../assets/listing-photos/kenny-eliason-mGZX2MOPR-s-unsplash.jpg';
-import photo14 from '../assets/listing-photos/paul-kapischka-NLbMgDBio4Y-unsplash.jpg';
-import photo15 from '../assets/listing-photos/roger-starnes-sr-HCbB3G1BuOY-unsplash.jpg';
-import photo16 from '../assets/listing-photos/roger-starnes-sr-pGH1-iHveX0-unsplash.jpg';
-import photo17 from '../assets/listing-photos/roger-starnes-sr-RUy7Q-8K6ag-unsplash.jpg';
-import photo18 from '../assets/listing-photos/ronnie-george-z11gbBo13ro-unsplash.jpg';
-import photo19 from '../assets/listing-photos/sasha-matveeva-EMa3jAiHGyI-unsplash.jpg';
-import photo20 from '../assets/listing-photos/sieuwert-otterloo-aren8nutd1Q-unsplash.jpg';
-import photo21 from '../assets/listing-photos/sigmund-2BwV9My8xAo-unsplash.jpg';
-import photo22 from '../assets/listing-photos/spacejoy-trG8989WjFA-unsplash.jpg';
-import photo23 from '../assets/listing-photos/spacejoy-YI2YkyaREHk-unsplash.jpg';
-import photo24 from '../assets/listing-photos/the-walters-art-museum-NW9wEO9Ay5U-unsplash.jpg';
-import photo25 from '../assets/listing-photos/theo-laflamme-Lm8Tj1f-bXk-unsplash.jpg';
-import photo26 from '../assets/listing-photos/todd-kent-178j8tJrNlc-unsplash.jpg';
-import photo27 from '../assets/listing-photos/ubeyonroad--1zTWWTqEtA-unsplash.jpg';
-import photo28 from '../assets/listing-photos/webaliser-_TPTXZd9mOo-unsplash.jpg';
-import photo29 from '../assets/listing-photos/wiseman-mabasa-D1Uxks4j9IQ-unsplash.jpg';
-
-// Array of imported photos
+// Free stock photos from public CDN (Unsplash via CDN)
+// These URLs are publicly available and work everywhere
 export const LISTING_PHOTOS = [
-  photo1, photo2, photo3, photo4, photo5, photo6, photo7, photo8, photo9, photo10,
-  photo11, photo12, photo13, photo14, photo15, photo16, photo17, photo18, photo19, photo20,
-  photo21, photo22, photo23, photo24, photo25, photo26, photo27, photo28, photo29,
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1507652313519-d4dc28e7e4df?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1508873699372-f003971e4bcc?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1513161455079-7ef1a826e90d?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1522331289122-9ba5e6cfe1eb?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1523217311519-3e73ea694f0f?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1533090161767-e6ffb9bedf60?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1505576399279-565b52f4ac71?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1512174786901-a088e8e5b318?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1549887534-f3760632-d7dd-4f20-a93f-4e8f27ce97b4?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1516567867245-4c5a2e61e219?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1512217867899-ab841d3c1f75?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1507652313519-d4dc28e7e4df?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1518896552869-9a7a52c78b69?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1522184212e51-6a9ac8a45fe5?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1514981891620-a86b8c5200b7?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1494145904049-0dca7b1dd15d?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1502895917128-be aa5c11b504?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1530268729831-4ca8f14ec9f7?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1494145904049-0dca7b1dd15d?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1502893691121-c1181d8b0bc8?w=400&h=300&fit=crop',
 ];
 
 // Simple fallback: an inline SVG data URL so the UI never shows a broken-image icon
