@@ -1336,3 +1336,69 @@ button:disabled,
 .toast-close:hover {
   color: var(--text);
 }
+
+/* MODAL / DIALOG */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 6, 23, 0.6);
+  z-index: 3000;
+  padding: 24px;
+  animation: fadeIn 0.12s ease;
+}
+
+.modal {
+  width: 100%;
+  max-width: 720px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: scaleIn 0.12s ease;
+}
+
+.modal-header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-body {
+  padding: 14px 18px;
+}
+
+.modal-message {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 48vh;
+  overflow: auto;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: rgba(11, 18, 33, 0.45);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.02);
+}
+
+.modal-actions {
+  padding: 12px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.modal.error {
+  border-left: 4px solid #f87171;
+}
+.modal.success {
+  border-left: 4px solid #86efac;
+}
+
