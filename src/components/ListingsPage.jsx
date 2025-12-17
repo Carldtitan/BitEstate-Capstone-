@@ -53,8 +53,12 @@ export default function ListingsPage() {
           const data = d.data();
           const numId = Number(data.contractId ?? data.id);
           const resolvedId = Number.isFinite(numId) ? numId : d.id;
-          // If the stored image is just the placeholder, ignore it so we can use project photos
-          const imgFromDb = data.image && String(data.image).includes("via.placeholder.com") ? null : data.image;
+          // Only accept DB image values that look like real image URLs/paths.
+          // Some stored links return HTML or redirect pages (200 OK) which can't be used as <img> sources.
+          const asStr = data.image ? String(data.image).trim() : "";
+          const isLocalListingPhoto = asStr.startsWith("/listing-photos/");
+          const looksLikeImageUrl = /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr) || /^https?:\/\/.+\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr);
+          const imgFromDb = isLocalListingPhoto || looksLikeImageUrl ? asStr : null;
           return {
             id: resolvedId,
             docId: d.id,
