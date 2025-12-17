@@ -42,8 +42,8 @@ export default function Navbar() {
                 {networkOk ? "💰" : "⚠️"} {shortAddress}
               </button>
               <div className="wallet-balances">
-                <span title="Ethereum balance">🔷 {ethBalance}</span>
-                <span title="Cowries balance">🪙 {balance.toLocaleString()}</span>
+                <span title="Ethereum balance">Ξ {ethBalance}</span>
+                <span title="Cowries balance">◎ {balance.toLocaleString()}</span>
               </div>
             </div>
           )}
