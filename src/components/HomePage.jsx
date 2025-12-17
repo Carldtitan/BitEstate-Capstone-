@@ -28,43 +28,42 @@ export default function HomePage() {
     <div className="layout">
       <section className="hero">
         <div className="hero-card">
-          <p className="badge">Trusted homes, verified titles</p>
-          <h1 className="hero-title">Find a home you love and move fast.</h1>
+          <p className="badge">Blockchain-verified property titles</p>
+          <h1 className="hero-title">Buy with confidence. Sell with clarity.</h1>
           <p className="hero-subtitle">
-            Browse ready homes, see clear details, and buy in a few steps. We keep the paperwork simple so you can
-            focus on the move.
+            BitEstate verifies property documents on the blockchain, eliminating fraud and speeding up transactions. Browse verified listings, compare documents, and complete purchases in minutes.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link to="/verify" className="btn-primary btn">
-              Verify a document
+              Verify Documents
             </Link>
             <Link to="/listings" className="btn">
-              Explore homes
+              Browse Listings
             </Link>
           </div>
           <div className="stat-band">
             <div className="stat">
-              <span className="muted">Trusted sellers</span>
-              <strong>Verified owners</strong>
+              <span>Document verification</span>
+              <strong>SHA-256 hashing</strong>
             </div>
             <div className="stat">
-              <span className="muted">Title ready</span>
-              <strong>Pre-checked docs</strong>
+              <span>Blockchain secured</span>
+              <strong>Tamper-proof</strong>
             </div>
             <div className="stat">
-              <span className="muted">Quick closing</span>
-              <strong>Guided steps</strong>
+              <span>Fast transactions</span>
+              <strong>On-chain purchases</strong>
             </div>
           </div>
         </div>
         <div className="hero-card">
           <img
             src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
-            alt="Modern living room"
+            alt="Trusted real estate marketplace"
             style={{ width: "100%", borderRadius: "14px" }}
           />
           <p className="muted" style={{ marginTop: "10px" }}>
-            Bright, modern listings with simple verification and purchase flows.
+            Verified property listings with cryptographic authenticity.
           </p>
         </div>
       </section>
