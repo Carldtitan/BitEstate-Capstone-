@@ -1,14 +1,14 @@
 import { useState, useCallback } from "react";
 import { getRandomListingPhoto } from "../utils/listingPhotos";
 
-const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
-  <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>
-    <rect width='100%' height='100%' fill='%23101a2b'/>
-    <g fill='%2388bdbc' font-family='Inter, Arial, sans-serif' font-size='28'>
-      <text x='50%' y='48%' text-anchor='middle' dominant-baseline='middle'>Image unavailable</text>
-    </g>
-  </svg>
-`)};
+const _PLACEHOLDER_SVG_CONTENT = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>
+  <rect width='100%' height='100%' fill='%23101a2b'/>
+  <g fill='%2388bdbc' font-family='Inter, Arial, sans-serif' font-size='28'>
+    <text x='50%' y='48%' text-anchor='middle' dominant-baseline='middle'>Image unavailable</text>
+  </g>
+</svg>`;
+
+const PLACEHOLDER_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(_PLACEHOLDER_SVG_CONTENT);
 
 export default function ImageWithFallback({ src, alt = "", className, listingId, ...rest }) {
   const normalized = (s) => (s ? (s.startsWith("/") ? s : "/" + s) : s);
