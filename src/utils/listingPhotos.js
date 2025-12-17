@@ -41,17 +41,6 @@ export const LISTING_PHOTOS = [
   photo21, photo22, photo23, photo24, photo25, photo26, photo27, photo28, photo29,
 ];
 
-// Simple fallback: an inline SVG data URL so the UI never shows a broken-image icon
-const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
-  <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>
-    <rect width='100%' height='100%' fill='%23101a2b'/>
-    <g fill='%2388bdbc' font-family='Inter, Arial, sans-serif' font-size='28'>
-      <text x='50%' y='48%' text-anchor='middle' dominant-baseline='middle'>Image unavailable</text>
-      <text x='50%' y='58%' text-anchor='middle' dominant-baseline='middle' font-size='18' fill='%2399a7ad'>Please refresh or check the build</text>
-    </g>
-  </svg>
-`)}`;
-
 /**
  * Get a random photo from the listing photos
  * Uses a simple hash based on listing ID for consistency
@@ -82,23 +71,15 @@ export function getRandomListingPhoto(listingId) {
     idNum = toUint32FromString(String(listingId));
   }
 
-  // Guard: if imports failed and there are no photos, return a placeholder
-  if (!LISTING_PHOTOS || LISTING_PHOTOS.length === 0) {
-    console.warn("Listing photos not available, using placeholder image");
-    return PLACEHOLDER_SVG;
-  }
-
   // Multiply by a large prime (Knuth's multiplicative constant) and take unsigned
   const mixed = Math.imul(idNum, 2654435761) >>> 0;
   const index = mixed % LISTING_PHOTOS.length;
-  const p = LISTING_PHOTOS[index];
-  return p || PLACEHOLDER_SVG;
+  return LISTING_PHOTOS[index];
 }
 
 /**
  * Get a truly random photo (not seeded)
  */
 export function getRandomPhoto() {
-  if (!LISTING_PHOTOS || LISTING_PHOTOS.length === 0) return PLACEHOLDER_SVG;
   return LISTING_PHOTOS[Math.floor(Math.random() * LISTING_PHOTOS.length)];
 }

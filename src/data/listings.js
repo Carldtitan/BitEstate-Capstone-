@@ -7,6 +7,8 @@ const baseListings = [
     baths: 2,
     area: 2100,
     owner: "Eko Estates",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa1",
   },
   {
@@ -17,6 +19,8 @@ const baseListings = [
     baths: 0,
     area: 10000,
     owner: "Coastal Developments",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa2",
   },
   {
@@ -27,6 +31,8 @@ const baseListings = [
     baths: 2,
     area: 1200,
     owner: "Urban Estates",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa3",
   },
   {
@@ -37,6 +43,8 @@ const baseListings = [
     baths: 3,
     area: 2600,
     owner: "Atlantic Homes",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa4",
   },
   {
@@ -47,6 +55,8 @@ const baseListings = [
     baths: 2,
     area: 2000,
     owner: "Table Bay Realty",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa5",
   },
   {
@@ -57,6 +67,8 @@ const baseListings = [
     baths: 2,
     area: 1800,
     owner: "Coral Homes",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa6",
   },
   {
@@ -67,6 +79,8 @@ const baseListings = [
     baths: 3,
     area: 2400,
     owner: "Hillside Properties",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa7",
   },
   {
@@ -77,6 +91,8 @@ const baseListings = [
     baths: 3,
     area: 2800,
     owner: "Central Heights",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
     docHash: "0xaaa8",
   },
 ];
