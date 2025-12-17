@@ -9,7 +9,6 @@ export default function Navbar() {
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
   const [menuOpen, setMenuOpen] = useState(false);
-  const [walletExpanded, setWalletExpanded] = useState(false);
 
   const shortAddress =
     walletAddress && walletAddress.length > 8
@@ -33,24 +32,19 @@ export default function Navbar() {
 
         {/* Right side - essentials only */}
         <div className="nav-right">
-          {/* Wallet Widget (collapsible) */}
+          {/* Wallet Widget */}
           {user && walletAddress && (
             <div className="wallet-widget">
               <button
                 className="btn"
-                onClick={() => setWalletExpanded(!walletExpanded)}
                 title={walletError || (networkOk ? "Connected" : "Wrong network")}
               >
                 {networkOk ? "💰" : "⚠️"} {shortAddress}
               </button>
-              {walletExpanded && !walletError && (
-                <div className="wallet-popup">
-                  <div style={{ fontSize: "12px", color: "#9ca3af" }}>
-                    <div>ETH: {ethBalance}</div>
-                    <div>Cowries: {balance.toLocaleString()}</div>
-                  </div>
-                </div>
-              )}
+              <div className="wallet-balances">
+                <span title="Ethereum balance">🔷 {ethBalance}</span>
+                <span title="Cowries balance">🪙 {balance.toLocaleString()}</span>
+              </div>
             </div>
           )}
 
