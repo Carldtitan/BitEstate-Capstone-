@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import HomePage from "./components/HomePage";
 import VerifyPage from "./components/VerifyPage";
 import ListingsPage from "./components/ListingsPage";
@@ -79,6 +80,7 @@ export default function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <Footer />
           </div>
         </WalletProvider>
       </AuthProvider>
