@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { getRandomListingPhoto } from "../utils/listingPhotos";
 import { db } from "../services/firebaseClient";
 import { collection, getDocs, deleteDoc, doc, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import ImageWithFallback from "./ImageWithFallback";
 
 export default function ListingsPage() {
   const { isAdmin } = useAuth();
@@ -452,7 +453,8 @@ export default function ListingsPage() {
           const canBuy = typeof home.id === "number" && verified && !sold && !isOwner;
           return (
             <div key={hashKey} className="card">
-              <img src={home.image || getRandomListingPhoto(home.id)} alt={home.title} loading="lazy" />
+              {/* ImageWithFallback will try variants and seeded fallback */}
+              <ImageWithFallback src={home.image} listingId={home.id} alt={home.title} loading="lazy" />
               <div className="card-body">
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
                   <h4 style={{ margin: 0 }}>{home.title}</h4>
