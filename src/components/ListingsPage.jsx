@@ -53,10 +53,12 @@ export default function ListingsPage() {
           const data = d.data();
           const numId = Number(data.contractId ?? data.id);
           const resolvedId = Number.isFinite(numId) ? numId : d.id;
+          // If the stored image is just the placeholder, ignore it so we can use project photos
+          const imgFromDb = data.image && String(data.image).includes("via.placeholder.com") ? null : data.image;
           return {
             id: resolvedId,
             docId: d.id,
-            image: data.image || getRandomListingPhoto(resolvedId),
+            image: imgFromDb || getRandomListingPhoto(resolvedId),
             ...data,
           };
         });

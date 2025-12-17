@@ -53,7 +53,6 @@ export default function ListPropertyPage() {
       docHash,
       verified,
       contractId: contractId ?? null,
-      image: "https://via.placeholder.com/400x260?text=Listing",
       createdAt: serverTimestamp(),
     });
   };
