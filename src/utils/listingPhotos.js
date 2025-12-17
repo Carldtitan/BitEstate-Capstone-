@@ -43,20 +43,20 @@ export const LISTING_PHOTOS = [
 
 /**
  * Get a random photo from the listing photos
- * Uses a seeded random based on listing ID for consistency
+ * Uses a simple hash based on listing ID for consistency
  * Same listing ID always returns same photo, different IDs get different photos
  */
 export function getRandomListingPhoto(listingId) {
-  // Create a consistent hash from the listing ID
-  let hash = 0;
-  const idStr = listingId.toString();
-  for (let i = 0; i < idStr.length; i++) {
-    const char = idStr.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-
-  const index = Math.abs(hash) % LISTING_PHOTOS.length;
+  // Simple but effective hash: multiply by prime, modulo by array length
+  // This distributes different IDs across different photos
+  const id = typeof listingId === 'number' ? listingId : parseInt(listingId) || 0;
+  
+  // Multiply by a large prime to spread values across the range
+  const hashed = (id * 2654435761) >>> 0; // >>> 0 makes it unsigned
+  
+  // Use modulo to get index in range [0, LISTING_PHOTOS.length)
+  const index = hashed % LISTING_PHOTOS.length;
+  
   return LISTING_PHOTOS[index];
 }
 
