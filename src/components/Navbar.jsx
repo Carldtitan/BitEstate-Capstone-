@@ -2,7 +2,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useWallet } from "../context/WalletContext";
-import CowrieLogo from "./CowrieLogo";
+import CowrieLogo from "./CowrieeLogo";
 
 export default function Navbar() {
   const { user, login, logout, isAdmin } = useAuth();
