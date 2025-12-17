@@ -41,6 +41,13 @@ export const LISTING_PHOTOS = [
   photo21, photo22, photo23, photo24, photo25, photo26, photo27, photo28, photo29,
 ];
 
+// Debug: log what we're getting
+if (typeof window !== 'undefined') {
+  console.log('LISTING_PHOTOS array length:', LISTING_PHOTOS.length);
+  console.log('First photo URL:', LISTING_PHOTOS[0]);
+  console.log('All photos:', LISTING_PHOTOS);
+}
+
 // Simple fallback: an inline SVG data URL so the UI never shows a broken-image icon
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
   <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'>
