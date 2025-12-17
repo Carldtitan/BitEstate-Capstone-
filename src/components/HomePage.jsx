@@ -21,7 +21,7 @@ export default function HomePage() {
           const numId = Number(data.contractId ?? data.id);
           const resolvedId = Number.isFinite(numId) ? numId : d.id;
           const asStr = data.image ? String(data.image).trim() : "";
-          const isLocalListingPhoto = asStr.startsWith("/listing-photos/");
+          const isLocalListingPhoto = asStr.startsWith("/listing-photos/") || asStr.startsWith("listing-photos/");
           const looksLikeImageUrl = /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr) || /^https?:\/\/.+\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr);
           const imgFromDb = isLocalListingPhoto || looksLikeImageUrl ? asStr : null;
           return {
