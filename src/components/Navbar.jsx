@@ -2,6 +2,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useWallet } from "../context/WalletContext";
+import CowrieLogo from "./CowrieLogo";
 
 export default function Navbar() {
   const { user, login, logout, isAdmin } = useAuth();
@@ -23,7 +24,7 @@ export default function Navbar() {
       <nav className="navbar">
         {/* Logo */}
         <Link className="brand" to="/" onClick={closeMenu}>
-          <span className="brand-badge">B</span>
+          <CowrieLogo size={36} />
           BitEstate
         </Link>
 
