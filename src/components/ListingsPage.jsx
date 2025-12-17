@@ -11,8 +11,10 @@ export default function ListingsPage() {
     "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80";
   const { isAdmin } = useAuth();
   const { walletAddress, networkOk, connectWallet, walletError } = useWallet();
+  const ITEMS_PER_PAGE = 20;
 
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState("");
   const [soldMap, setSoldMap] = useState({});
   const [existsMap, setExistsMap] = useState({});
@@ -197,6 +199,17 @@ export default function ListingsPage() {
     soldMap,
     hashStatus,
   ]);
+
+  // Pagination
+  const totalPages = Math.ceil(listings.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const paginatedListings = listings.slice(startIdx, endIdx);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterOnChain, filterMinPrice, filterMaxPrice, filterMinSqft, filterMaxSqft, filterMinBeds, filterMaxBeds, filterMinBaths, filterMaxBaths]);
 
   const handleBuy = async (listing) => {
     setStatus("");
@@ -423,7 +436,7 @@ export default function ListingsPage() {
         <div className="status">Checking on-chain availability...</div>
       )}
       <div className="grid">
-        {listings.map((home) => {
+        {paginatedListings.map((home) => {
           const sold = home.id && soldMap[home.id];
           const exists = home.id && existsMap[home.id];
           const isBuying = purchasingId === home.id;
@@ -499,6 +512,43 @@ export default function ListingsPage() {
           );
         })}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "24px", flexWrap: "wrap" }}>
+          <button
+            className="btn"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+          >
+            ← Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              className="btn"
+              style={{
+                background: currentPage === i + 1 ? "linear-gradient(135deg, #2dd4bf, #14b8a6)" : "var(--panel)",
+                color: currentPage === i + 1 ? "#0b1221" : "var(--text)",
+                fontWeight: currentPage === i + 1 ? "600" : "500",
+              }}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            className="btn"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+          >
+            Next →
+          </button>
+          <span className="muted" style={{ alignSelf: "center", marginLeft: "8px" }}>
+            Page {currentPage} of {totalPages} ({listings.length} results)
+          </span>
+        </div>
+      )}
     </div>
   );
 }
