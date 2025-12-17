@@ -9,13 +9,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDYrdy-ALKekM0fC6UQ2JuAXgOrpMMmxZ0",
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "bitestate-a77a3.firebaseapp.com",
-  projectId: process.env.FIREBASE_PROJECT_ID || "bitestate-a77a3",
-  appId: process.env.FIREBASE_APP_ID || "1:403297736948:web:0bf79bff07e4a8e3e626a1",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyDYrdy-ALKekM0fC6UQ2JuAXgOrpMMmxZ0",
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "bitestate-a77a3.firebaseapp.com",
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "bitestate-a77a3",
+  appId: process.env.REACT_APP_FIREBASE_APP_ID || "1:403297736948:web:0bf79bff07e4a8e3e626a1",
 };
 
-const adminEmails = (process.env.ADMIN_EMAILS || "")
+const adminEmails = (process.env.REACT_APP_ADMIN_EMAILS || "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
@@ -43,7 +43,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [firebaseReady, setFirebaseReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const provider = useMemo(() => new GoogleAuthProvider(), []);
+  const provider = useMemo(() => {
+    const p = new GoogleAuthProvider();
+    // Configure OAuth for better error messages and explicit sign-in UI
+    p.setCustomParameters({ prompt: 'select_account' });
+    return p;
+  }, []);
 
   useEffect(() => {
     try {
