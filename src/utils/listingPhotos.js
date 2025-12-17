@@ -8,7 +8,7 @@ export const LISTING_PHOTOS = [
   'listing-photos/aubrey-odom-ITzfgP77DTg-unsplash.jpg',
   'listing-photos/austin-Jmi3nWiILOc-unsplash.jpg',
   'listing-photos/brett-jordan-5x_JYiq5PHk-unsplash.jpg',
-  '/listing-photos/dan-begel-cmZfiElLkO8-unsplash.jpg',
+  'listing-photos/dan-begel-cmZfiElLkO8-unsplash.jpg',
   'listing-photos/devon-mackay-2TqK32k2ZCc-unsplash.jpg',
   'listing-photos/devon-mackay-fhU7X34rCAE-unsplash.jpg',
   'listing-photos/dillon-kydd-2keCPb73aQY-unsplash.jpg',
@@ -34,7 +34,7 @@ export const LISTING_PHOTOS = [
   'listing-photos/ubeyonroad--1zTWWTqEtA-unsplash.jpg',
   'listing-photos/webaliser-_TPTXZd9mOo-unsplash.jpg',
   'listing-photos/wiseman-mabasa-D1Uxks4j9IQ-unsplash.jpg',
-];
+].map((p) => (p.startsWith('/') ? p : '/' + p));
 
 // Debug log so you can see the exact URL used for a sample listing in the browser console
 if (typeof window !== 'undefined') {

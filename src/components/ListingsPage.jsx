@@ -56,7 +56,7 @@ export default function ListingsPage() {
           // Only accept DB image values that look like real image URLs/paths.
           // Some stored links return HTML or redirect pages (200 OK) which can't be used as <img> sources.
           const asStr = data.image ? String(data.image).trim() : "";
-          const isLocalListingPhoto = asStr.startsWith("/listing-photos/");
+          const isLocalListingPhoto = asStr.startsWith("/listing-photos/") || asStr.startsWith("listing-photos/");
           const looksLikeImageUrl = /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr) || /^https?:\/\/.+\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr);
           const imgFromDb = isLocalListingPhoto || looksLikeImageUrl ? asStr : null;
           return {
