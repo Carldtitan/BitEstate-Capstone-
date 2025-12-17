@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import listings from "../data/listings";
 import { getListing } from "../contract.js";
 import { getRandomListingPhoto } from "../utils/listingPhotos";
+import ImageWithFallback from "./ImageWithFallback";
 import { db } from "../services/firebaseClient";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -122,7 +123,7 @@ export default function HomePage() {
         <div className="grid">
           {featured.map((home) => (
             <div key={home.id} className="card">
-              <img src={home.image || getRandomListingPhoto(home.id)} alt={home.title} />
+              <ImageWithFallback src={home.image} listingId={home.id} alt={home.title} />
               <div className="card-body">
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
                   <h4 style={{ margin: 0 }}>{home.title}</h4>
