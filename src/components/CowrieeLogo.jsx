@@ -20,12 +20,12 @@ export default function CowrieLogo({ size = 36 }) {
         </radialGradient>
       </defs>
 
-      {/* Main cowrie shell - rounded egg shape */}
+      {/* Main cowrie shell - more horizontal rounded shape */}
       <ellipse
         cx="50"
-        cy="48"
-        rx="28"
-        ry="35"
+        cy="50"
+        rx="35"
+        ry="26"
         fill="url(#shellGradient)"
         stroke="#d4cec1"
         strokeWidth="0.5"
@@ -34,15 +34,15 @@ export default function CowrieLogo({ size = 36 }) {
       {/* Shell shine/gloss */}
       <ellipse
         cx="38"
-        cy="32"
-        rx="18"
-        ry="22"
+        cy="38"
+        rx="22"
+        ry="16"
         fill="url(#shellShine)"
       />
 
       {/* Characteristic cowrie opening/mouth - darker curved slit */}
       <path
-        d="M 35 62 Q 50 70 65 62"
+        d="M 32 58 Q 50 65 68 58"
         stroke="#2d1810"
         strokeWidth="3"
         fill="none"
@@ -52,7 +52,7 @@ export default function CowrieLogo({ size = 36 }) {
 
       {/* Inner mouth shadow for depth */}
       <path
-        d="M 36 63 Q 50 68 64 63"
+        d="M 33 59 Q 50 64 67 59"
         stroke="#4a3728"
         strokeWidth="1"
         fill="none"
@@ -62,21 +62,21 @@ export default function CowrieLogo({ size = 36 }) {
 
       {/* Shell ridges/texture lines for realism */}
       <path
-        d="M 40 35 Q 50 30 60 35"
+        d="M 35 38 Q 50 33 65 38"
         stroke="rgba(212, 206, 193, 0.6)"
         strokeWidth="1"
         fill="none"
         strokeLinecap="round"
       />
       <path
-        d="M 38 48 Q 50 45 62 48"
+        d="M 32 50 Q 50 47 68 50"
         stroke="rgba(212, 206, 193, 0.5)"
         strokeWidth="0.8"
         fill="none"
         strokeLinecap="round"
       />
       <path
-        d="M 40 58 Q 50 56 60 58"
+        d="M 35 60 Q 50 58 65 60"
         stroke="rgba(212, 206, 193, 0.4)"
         strokeWidth="0.8"
         fill="none"

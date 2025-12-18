@@ -4,6 +4,7 @@ import listings from "../data/listings";
 import { getListing } from "../contract.js";
 import { getRandomListingPhoto } from "../utils/listingPhotos";
 import ImageWithFallback from "./ImageWithFallback";
+import CowrieLogo from "./CowrieeLogo";
 import { db } from "../services/firebaseClient";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -242,6 +243,33 @@ export default function HomePage() {
           <Link to="/listings" className="btn">
             Browse Listings
           </Link>
+        </div>
+      </section>
+
+      {/* Cowrie Currency Section */}
+      <section className="section">
+        <div className="section-header">
+          <div>
+            <h2 style={{ margin: 0 }}>Cowries: Your Real Estate Currency</h2>
+            <p className="muted">Trade properties with blockchain-backed digital currency</p>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "40px", flexWrap: "wrap" }}>
+          <div style={{ flex: "0 0 auto" }}>
+            <CowrieLogo size={200} />
+          </div>
+          <div style={{ flex: "1", minWidth: "250px" }}>
+            <h3>Earn & Spend Cowries</h3>
+            <p>
+              Cowries are digital currency tokens backed by blockchain verification. List properties to earn Cowries, or use them to purchase verified real estate listings on BitEstate.
+            </p>
+            <ul style={{ marginTop: "12px", lineHeight: "1.8" }}>
+              <li>✓ Earn Cowries when you list properties</li>
+              <li>✓ Use Cowries to purchase verified listings</li>
+              <li>✓ Exchange with other users securely</li>
+              <li>✓ Track all transactions on-chain</li>
+            </ul>
+          </div>
         </div>
       </section>
     </div>
