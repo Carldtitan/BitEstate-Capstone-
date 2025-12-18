@@ -3,7 +3,7 @@ export default function CowrieLogo({ size = 36 }) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 120 100"
+      viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -14,32 +14,32 @@ export default function CowrieLogo({ size = 36 }) {
         </linearGradient>
       </defs>
 
-      {/* Main shell body - simple horizontal ellipse */}
+      {/* Main shell body - simple horizontal ellipse, centered */}
       <ellipse
-        cx="60"
-        cy="45"
-        rx="45"
-        ry="32"
+        cx="50"
+        cy="42"
+        rx="38"
+        ry="28"
         fill="url(#simpleShell)"
         stroke="#ccc8c0"
-        strokeWidth="1"
+        strokeWidth="0.8"
       />
 
       {/* Simple shine on top */}
       <ellipse
-        cx="45"
+        cx="40"
         cy="30"
-        rx="20"
-        ry="14"
+        rx="18"
+        ry="12"
         fill="white"
-        opacity="0.35"
+        opacity="0.4"
       />
 
       {/* Dark curved mouth - the defining feature */}
       <path
-        d="M 30 60 Q 60 72 90 60"
+        d="M 25 58 Q 50 68 75 58"
         stroke="#3d3531"
-        strokeWidth="4"
+        strokeWidth="3.5"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
