@@ -7,62 +7,78 @@ export default function CowrieLogo({ size = 36 }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Define gradients */}
+      {/* Define gradients for realistic shell */}
       <defs>
-        <linearGradient id="cowrieGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{ stopColor: "#22d3ee", stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: "#14b8a6", stopOpacity: 1 }} />
+        <linearGradient id="shellGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#fefbf3", stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: "#f5f1e8", stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: "#e8e3d8", stopOpacity: 1 }} />
         </linearGradient>
-        <radialGradient id="cowrieShine" cx="35%" cy="35%">
-          <stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 0.4 }} />
+        <radialGradient id="shellShine" cx="30%" cy="25%">
+          <stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 0.6 }} />
           <stop offset="100%" style={{ stopColor: "#ffffff", stopOpacity: 0 }} />
         </radialGradient>
       </defs>
 
-      {/* Main cowrie shell body - smooth oval */}
+      {/* Main cowrie shell - rounded egg shape */}
       <ellipse
         cx="50"
-        cy="42"
-        rx="32"
-        ry="38"
-        fill="url(#cowrieGradient)"
-        stroke="#0b8c8c"
-        strokeWidth="1"
+        cy="48"
+        rx="28"
+        ry="35"
+        fill="url(#shellGradient)"
+        stroke="#d4cec1"
+        strokeWidth="0.5"
       />
 
-      {/* Shell shine/gloss effect */}
+      {/* Shell shine/gloss */}
       <ellipse
-        cx="50"
-        cy="42"
-        rx="32"
-        ry="38"
-        fill="url(#cowrieShine)"
+        cx="38"
+        cy="32"
+        rx="18"
+        ry="22"
+        fill="url(#shellShine)"
       />
 
-      {/* Cowrie opening/slit at bottom */}
-      <ellipse
-        cx="50"
-        cy="68"
-        rx="14"
-        ry="8"
-        fill="#0b1221"
-        opacity="0.6"
-      />
-
-      {/* Opening detail - curved lines */}
+      {/* Characteristic cowrie opening/mouth - darker curved slit */}
       <path
-        d="M 38 68 Q 50 72 62 68"
-        stroke="#22d3ee"
-        strokeWidth="1.5"
+        d="M 35 62 Q 50 70 65 62"
+        stroke="#2d1810"
+        strokeWidth="3"
         fill="none"
-        opacity="0.8"
+        strokeLinecap="round"
+        opacity="0.7"
       />
 
-      {/* Ridge detail for depth */}
+      {/* Inner mouth shadow for depth */}
       <path
-        d="M 35 45 Q 50 38 65 45"
-        stroke="rgba(255, 255, 255, 0.2)"
-        strokeWidth="2"
+        d="M 36 63 Q 50 68 64 63"
+        stroke="#4a3728"
+        strokeWidth="1"
+        fill="none"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+
+      {/* Shell ridges/texture lines for realism */}
+      <path
+        d="M 40 35 Q 50 30 60 35"
+        stroke="rgba(212, 206, 193, 0.6)"
+        strokeWidth="1"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M 38 48 Q 50 45 62 48"
+        stroke="rgba(212, 206, 193, 0.5)"
+        strokeWidth="0.8"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M 40 58 Q 50 56 60 58"
+        stroke="rgba(212, 206, 193, 0.4)"
+        strokeWidth="0.8"
         fill="none"
         strokeLinecap="round"
       />
