@@ -1,7 +1,6 @@
 # Listing Photos
 
-This folder contains stock photos that were used by the older marketplace demo. The current
-release does not rely on them, but they are kept here for reference.
+This folder contains the stock photos used by the locked marketplace preview.
 
 ## Setup Instructions
 

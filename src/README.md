@@ -1,4 +1,4 @@
 # Source Code
 
-This folder will contain the main source code for the MVP, including login functionality, blockchain logging, and property record handling.
+This folder contains the app for the three-tab demo: verify, source of truth, and the locked marketplace preview.
 
