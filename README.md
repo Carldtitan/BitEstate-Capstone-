@@ -1,11 +1,19 @@
 # BitEstate Capstone
 
-Blockchain-backed real estate demo with document verification, Cowries wallet purchasing, and Google sign-in.
+BitEstate is a document verification app for title and settlement workflows.
 
-## Features
-- Modern Airbnb-inspired UI with hero, cards, and responsive grid.
-- SHA-256 PDF comparison for exact matches on the Verify page.
-- Cowries wallet (random starting balance per user) to buy verified listings.
-- 50 seeded listings with prices in USD and Cowries.
-- Upload + on-chain hash logging (mock fallback).
-- Google authentication via Firebase (or local demo login fallback).
+## Current Scope
+- Google sign-in for authenticated access.
+- Admin-only trusted reference registration with on-chain hash logging.
+- Document verification against a trusted source version.
+- Proof receipts and an audit trail that records who verified what, and when.
+- Marketplace placeholder preserved as "Coming Soon".
+
+## What Is Intentionally Excluded
+- Buying and selling flows.
+- Property marketplace browsing as a live feature.
+- Claims that BitEstate replaces county recording or legal ownership checks.
+
+## Notes
+- The app uses Sepolia for reference hash registration when a wallet is connected.
+- If Firebase is not configured, the app can fall back to local demo behavior for sign-in.

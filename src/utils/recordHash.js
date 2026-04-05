@@ -1,19 +1,20 @@
 import crypto from "crypto-js";
 
-// Build a deterministic record hash from file hash + required fields.
-// Required fields must include: owner, ownerId, propertyTitle, propertyType, location, size, beds, baths, year.
-export function buildRecordHash(fileHash, fields) {
+// Build a deterministic receipt hash from a file hash plus the most important metadata.
+// The shape is intentionally flexible so the same helper can support reference registration
+// and verification receipts without tying the app to one property-listing workflow.
+export function buildRecordHash(fileHash, fields = {}) {
   const meta = {
-    owner: fields.owner || "",
-    ownerId: fields.ownerId || "",
-    propertyTitle: fields.propertyTitle || "",
-    propertyType: fields.propertyType || "",
-    location: fields.location || "",
-    size: fields.size || "",
-    beds: fields.beds || "",
-    baths: fields.baths || "",
-    year: fields.year || "",
+    title: fields.title || fields.documentTitle || fields.propertyTitle || "",
+    documentType: fields.documentType || fields.propertyType || "",
+    jurisdiction: fields.jurisdiction || fields.location || "",
+    fileName: fields.fileName || "",
+    version: fields.version || "",
+    notes: fields.notes || "",
+    referenceId: fields.referenceId || "",
+    verifiedBy: fields.verifiedBy || "",
+    result: fields.result || "",
   };
   const metaHash = crypto.SHA256(JSON.stringify(meta)).toString();
-  return crypto.SHA256(fileHash + metaHash).toString();
+  return crypto.SHA256(`${fileHash}:${metaHash}`).toString();
 }

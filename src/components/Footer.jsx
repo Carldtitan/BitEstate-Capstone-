@@ -1,65 +1,49 @@
+import { Link } from "react-router-dom";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="footer">
       <div className="layout">
-        <div className="footer-grid">
-          {/* Brand Section */}
+        <div className="footer-grid footer-grid-slim">
           <div className="footer-section">
             <div className="footer-brand">
-              <span className="footer-badge">◎</span>
+              <span className="footer-badge">B</span>
               <h3>BitEstate</h3>
             </div>
-            <p>Blockchain-verified property titles for secure real estate transactions.</p>
-            <div className="social-links">
-              <a href="#" title="Twitter" aria-label="Twitter">𝕏</a>
-              <a href="#" title="GitHub" aria-label="GitHub">◊</a>
-              <a href="#" title="Discord" aria-label="Discord">⬡</a>
-            </div>
+            <p>
+              Document verification for title and settlement teams. The marketplace stays in the
+              codebase, but the current release focuses on trusted references and audit receipts.
+            </p>
           </div>
 
-          {/* Product Links */}
           <div className="footer-section">
             <h4>Product</h4>
             <ul className="footer-links">
-              <li><a href="/">Browse Listings</a></li>
-              <li><a href="/list-property">List Property</a></li>
-              <li><a href="/verify">Verify Document</a></li>
-              <li><a href="/my-properties">My Properties</a></li>
+              <li><Link to="/verify">Verify document</Link></li>
+              <li><Link to="/register">Register reference</Link></li>
+              <li><Link to="/audit-trail">Audit trail</Link></li>
+              <li><Link to="/marketplace">Marketplace coming soon</Link></li>
             </ul>
           </div>
 
-          {/* Company Links */}
           <div className="footer-section">
-            <h4>Company</h4>
+            <h4>Scope</h4>
             <ul className="footer-links">
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#blog">Blog</a></li>
-              <li><a href="#careers">Careers</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div className="footer-section">
-            <h4>Legal</h4>
-            <ul className="footer-links">
-              <li><a href="#privacy">Privacy Policy</a></li>
-              <li><a href="#terms">Terms of Service</a></li>
-              <li><a href="#disclaimer">Disclaimer</a></li>
-              <li><a href="#contact">Support</a></li>
+              <li><span>California-first pilot</span></li>
+              <li><span>Trusted source registration</span></li>
+              <li><span>Proof receipts</span></li>
+              <li><span>Version tracking</span></li>
             </ul>
           </div>
         </div>
 
-        {/* Divider */}
         <div className="footer-divider"></div>
 
-        {/* Bottom Section */}
         <div className="footer-bottom">
           <p>&copy; {currentYear} BitEstate. All rights reserved.</p>
-          <p className="footer-tagline">Powered by Ethereum • Built on Vercel</p>
+          <p className="footer-tagline">Built for document integrity, not marketplace hype.</p>
         </div>
       </div>
     </footer>

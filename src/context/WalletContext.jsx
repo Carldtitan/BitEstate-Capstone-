@@ -1,99 +1,68 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { BrowserProvider, formatEther } from "ethers";
 
 const WalletContext = createContext();
-
-const STORAGE_KEY = "bitestate_wallet_v1";
-const COWRIES_PER_ETH = 200000; // 10,000 Cowries = 0.05 ETH -> 200,000 per ETH
-
-function loadWallets() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch (err) {
-    console.warn("Could not load wallets", err);
-    return {};
-  }
-}
-
-function saveWallets(wallets) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(wallets));
-  } catch (err) {
-    console.warn("Could not persist wallets", err);
-  }
-}
+const TARGET_CHAIN_ID = "0xaa36a7";
 
 export function WalletProvider({ children }) {
   const { user } = useAuth();
-  const [wallets, setWallets] = useState({});
-  const [balance, setBalance] = useState(0);
-  const [owned, setOwned] = useState({});
   const [walletAddress, setWalletAddress] = useState(null);
+  const [chainId, setChainId] = useState("");
   const [networkOk, setNetworkOk] = useState(true);
   const [walletError, setWalletError] = useState("");
-  const [ethBalance, setEthBalance] = useState("0");
 
-  useEffect(() => {
-    setWallets(loadWallets());
-  }, []);
+  const disconnectWallet = () => {
+    setWalletAddress(null);
+    setChainId("");
+    setNetworkOk(true);
+    setWalletError("");
+  };
 
   useEffect(() => {
     if (!user) {
-      setBalance(0);
-      setOwned({});
-      setWalletAddress(null);
-      setEthBalance("0");
-      return;
+      disconnectWallet();
     }
-    const existing = wallets[user.uid];
-    if (existing) {
-      setBalance(existing.balance || 0);
-      setOwned(existing.owned || {});
-      return;
-    }
-    const next = { ...wallets, [user.uid]: { balance: 0, owned: {} } };
-    setWallets(next);
-    setBalance(0);
-    setOwned({});
-    saveWallets(next);
-  }, [user, wallets]);
+  }, [user]);
 
-  const updateWallet = (nextWallet) => {
-    if (!user) return;
-    const next = { ...wallets, [user.uid]: nextWallet };
-    setWallets(next);
-    saveWallets(next);
-  };
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.ethereum) return undefined;
 
-  const canAfford = (price) => balance >= price;
+    const syncChain = async (nextAddress = null) => {
+      try {
+        const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
+        setChainId(currentChainId);
+        setNetworkOk(currentChainId === TARGET_CHAIN_ID);
+        if (nextAddress !== null) {
+          setWalletAddress(nextAddress);
+        }
+      } catch (error) {
+        console.warn("Could not read chain id", error);
+      }
+    };
 
-  const purchase = (listing) => {
-    if (!user) throw new Error("Login required to purchase");
-    if (!canAfford(listing.cowries)) throw new Error("Insufficient Cowries");
-    const newBalance = balance - listing.cowries;
-    const nextOwned = { ...owned, [listing.id]: listing };
-    setBalance(newBalance);
-    setOwned(nextOwned);
-    updateWallet({ balance: newBalance, owned: nextOwned });
-  };
+    const handleAccountsChanged = (accounts) => {
+      const nextAddress = accounts?.[0] || null;
+      setWalletAddress(nextAddress);
+      if (!nextAddress) {
+        setWalletError("");
+        return;
+      }
+      syncChain(nextAddress);
+    };
 
-  const refreshWalletBalance = async (address) => {
-    try {
-      const provider = new BrowserProvider(window.ethereum);
-      const wei = await provider.getBalance(address);
-      const eth = parseFloat(formatEther(wei));
-      const cowries = Math.floor(eth * COWRIES_PER_ETH);
-      setEthBalance(eth.toFixed(6));
-      setBalance(cowries);
-      updateWallet({ balance: cowries, owned });
-    } catch (err) {
-      console.warn("Could not refresh wallet balance", err);
-      setEthBalance("0");
-      setBalance(0);
-    }
-  };
+    const handleChainChanged = (nextChainId) => {
+      setChainId(nextChainId);
+      setNetworkOk(nextChainId === TARGET_CHAIN_ID);
+    };
+
+    window.ethereum.on("accountsChanged", handleAccountsChanged);
+    window.ethereum.on("chainChanged", handleChainChanged);
+
+    return () => {
+      window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+      window.ethereum?.removeListener("chainChanged", handleChainChanged);
+    };
+  }, []);
 
   const connectWallet = async () => {
     if (!user) {
@@ -110,28 +79,15 @@ export function WalletProvider({ children }) {
     try {
       setWalletError("");
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const address = accounts[0];
+      const address = accounts[0] || null;
       setWalletAddress(address);
-      refreshWalletBalance(address);
-      try {
-        const chainId = await window.ethereum.request({ method: "eth_chainId" });
-        setNetworkOk(chainId === "0xaa36a7"); // Sepolia
-      } catch (err) {
-        console.warn("Could not read chain id", err);
-        setNetworkOk(true);
-      }
-      window.ethereum.on("chainChanged", (cid) => {
-        setNetworkOk(cid === "0xaa36a7");
-      });
-      window.ethereum.on("accountsChanged", (accs) => {
-        const nextAddr = accs[0] || null;
-        setWalletAddress(nextAddr);
-        if (nextAddr) refreshWalletBalance(nextAddr);
-      });
+      const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
+      setChainId(currentChainId);
+      setNetworkOk(currentChainId === TARGET_CHAIN_ID);
       return address;
-    } catch (err) {
-      console.warn("Failed to connect wallet", err);
-      setWalletError(err?.message || "Failed to connect to MetaMask.");
+    } catch (error) {
+      console.warn("Failed to connect wallet", error);
+      setWalletError(error?.message || "Failed to connect to MetaMask.");
       setWalletAddress(null);
       return null;
     }
@@ -140,15 +96,12 @@ export function WalletProvider({ children }) {
   return (
     <WalletContext.Provider
       value={{
-        balance,
-        ethBalance,
-        owned,
-        purchase,
-        canAfford,
         walletAddress,
+        chainId,
         networkOk,
         walletError,
         connectWallet,
+        disconnectWallet,
       }}
     >
       {children}
