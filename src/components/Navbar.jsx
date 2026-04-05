@@ -7,12 +7,15 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link className="brand" to="/verify">
+      <Link className="brand" to="/">
         <CowrieLogo size={36} />
         <span>BitEstate</span>
       </Link>
 
       <div className="navbar-tabs">
+        <NavLink end to="/" className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}>
+          Home
+        </NavLink>
         <NavLink to="/verify" className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}>
           Verify
         </NavLink>
@@ -20,7 +23,7 @@ export default function Navbar() {
           to="/source-truth"
           className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}
         >
-          Source of Truth
+          Source
         </NavLink>
         <NavLink
           to="/marketplace"

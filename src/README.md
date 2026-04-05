@@ -1,4 +1,4 @@
 # Source Code
 
-This folder contains the app for the three-tab demo: verify, source of truth, and the locked marketplace preview.
+This folder contains the app for the home page, verify tab, source tab, and the locked marketplace preview.
 

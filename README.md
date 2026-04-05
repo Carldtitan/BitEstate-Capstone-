@@ -1,9 +1,10 @@
 # BitEstate Capstone
 
-BitEstate is a live demo with three tabs:
+BitEstate is a live demo with a home page plus verify, source, and marketplace:
 
+- Home: the front door.
 - Verify: SHA256 match + Sepolia check.
-- Source of Truth: unlock with the device code, then write the source hash on chain.
+- Source: unlock with the device code, then write the source hash on chain.
 - Marketplace: frozen preview only.
 
 ## Current Scope

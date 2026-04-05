@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import HomePage from "./components/HomePage";
 import VerifyPage from "./components/VerifyPage";
 import ComingSoonPage from "./components/ComingSoonPage";
 import UploadPage from "./components/UploadPage";
@@ -24,7 +25,8 @@ export default function App() {
           <div className="page-shell">
             <Navbar />
             <Routes>
-              <Route path="/" element={<Navigate to="/verify" replace />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/home" element={<HomePage />} />
               <Route path="/verify" element={<VerifyPage />} />
               <Route path="/source-truth" element={<UploadPage />} />
               <Route path="/register" element={<Navigate to="/source-truth" replace />} />
@@ -42,7 +44,7 @@ export default function App() {
                   </LoginGate>
                 }
               />
-              <Route path="*" element={<Navigate to="/verify" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Footer />
           </div>
