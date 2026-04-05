@@ -6,9 +6,9 @@
   --accent: #8a5b3a;
   --accent-strong: #6f452b;
   --accent-light: #b57b52;
-  --text: #3b2518;
-  --text-secondary: #5e4636;
-  --muted: #806657;
+  --text: #2c1a10;
+  --text-secondary: #4e392c;
+  --muted: #675142;
   --border: #dcc8b7;
   --shadow: 0 12px 28px rgba(92, 61, 35, 0.12);
   --shadow-sm: 0 3px 10px rgba(92, 61, 35, 0.08);
@@ -137,6 +137,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Fraunces", Georgia, serif;
   font-weight: 700;
   line-height: 1.12;
+  color: var(--text);
 }
 
 h1 {
@@ -1809,6 +1810,7 @@ button:disabled,
   padding: clamp(24px, 4vw, 36px);
   position: relative;
   overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 248, 240, 0.98), rgba(244, 227, 209, 0.98));
 }
 
 .home-copy::before {
@@ -1835,15 +1837,18 @@ button:disabled,
 
 .home-title {
   margin: 0 0 16px;
-  font-size: clamp(38px, 6vw, 72px);
-  line-height: 0.95;
+  color: #2a1710;
+  font-size: clamp(34px, 5.4vw, 64px);
+  font-weight: 800;
+  line-height: 0.98;
   max-width: 12ch;
+  letter-spacing: -0.03em;
 }
 
 .home-subtitle {
   max-width: 52ch;
   margin: 0 0 22px;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: clamp(15px, 2vw, 18px);
 }
 
@@ -1868,7 +1873,7 @@ button:disabled,
 
 .home-preview-card {
   padding: clamp(20px, 4vw, 28px);
-  background: linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(241, 224, 204, 0.9));
+  background: linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(243, 228, 212, 0.94));
 }
 
 .home-step-list {
@@ -1902,11 +1907,12 @@ button:disabled,
 .home-step strong {
   display: block;
   margin-bottom: 4px;
+  color: #2a1710;
 }
 
 .home-step p {
   margin: 0;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
@@ -1921,7 +1927,7 @@ button:disabled,
   padding: 16px;
   text-decoration: none;
   color: inherit;
-  background: rgba(255, 250, 244, 0.82);
+  background: rgba(255, 250, 244, 0.94);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -1934,11 +1940,12 @@ button:disabled,
 .home-mini-card h3 {
   margin: 0 0 8px;
   font-size: 20px;
+  color: #2a1710;
 }
 
 .home-mini-card p {
   margin: 0;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -1950,6 +1957,7 @@ button:disabled,
 
 .home-feature-card {
   padding: 18px;
+  background: rgba(255, 250, 244, 0.96);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1962,11 +1970,12 @@ button:disabled,
 .home-feature-card h3 {
   margin: 0 0 10px;
   font-size: 24px;
+  color: #2a1710;
 }
 
 .home-feature-card p {
   margin: 0;
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
 .footer-grid-slim {
