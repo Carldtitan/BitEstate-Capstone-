@@ -20,8 +20,9 @@ export default function Footer() {
           <div className="footer-section">
             <h4>Tabs</h4>
             <ul className="footer-links">
+              <li><Link to="/">Home</Link></li>
               <li><Link to="/verify">Verify</Link></li>
-              <li><Link to="/source-truth">Source of Truth</Link></li>
+              <li><Link to="/source-truth">Source</Link></li>
               <li><Link to="/marketplace">Marketplace</Link></li>
             </ul>
           </div>
