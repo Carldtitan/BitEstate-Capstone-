@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { generateHash } from "../hash";
+import { useAuth } from "../context/AuthContext";
 import { verifyHash } from "../contract.js";
+import { generateHash } from "../hash";
 import { copyToClipboard } from "../utils/clipboard";
 import { buildRecordHash } from "../utils/recordHash";
 import {
@@ -9,7 +10,6 @@ import {
   listVerificationLogs,
   saveVerificationLog,
 } from "../services/bitestateStore";
-import { useAuth } from "../context/AuthContext";
 
 function shortHash(value) {
   if (!value) return "-";
@@ -48,7 +48,7 @@ export default function VerifyPage() {
         setLogs(nextLogs);
       } catch (error) {
         console.warn("Failed to load references", error);
-        setStatus("Trusted references could not be loaded.");
+        setStatus("Could not load sources.");
       }
     };
     load();
@@ -67,15 +67,15 @@ export default function VerifyPage() {
 
   const handleVerify = async () => {
     if (!selectedReference) {
-      setStatus("Register a trusted reference first.");
+      setStatus("Upload a source first.");
       return;
     }
     if (!candidateFile) {
-      setStatus("Upload the document you want to verify.");
+      setStatus("Choose a file.");
       return;
     }
 
-    setStatus("Hashing document and checking against the trusted reference...");
+    setStatus("Hashing file...");
     setChainStatus("");
     setReceipt(null);
 
@@ -83,16 +83,17 @@ export default function VerifyPage() {
       const nextCandidateHash = await generateHash(candidateFile);
       const match = nextCandidateHash === selectedReference.fileHash;
       const onChain = selectedReference.onChainTxHash ? true : await verifyHash(selectedReference.fileHash);
-      const verifiedByName = user?.displayName || user?.email || "Signed-in user";
+      const verifiedByName = user?.displayName || user?.email || "Guest";
       const receiptHash = buildRecordHash(nextCandidateHash, {
         title: selectedReference.documentTitle,
         documentType: selectedReference.documentType,
         jurisdiction: selectedReference.jurisdiction,
         fileName: candidateFile.name,
-        referenceId: selectedReference.id,
+        sourceId: selectedReference.id,
         verifiedBy: verifiedByName,
         result: match ? "match" : "mismatch",
       });
+
       const logEntry = await saveVerificationLog({
         referenceId: selectedReference.id,
         referenceTitle: selectedReference.documentTitle,
@@ -113,18 +114,18 @@ export default function VerifyPage() {
 
       setCandidateHash(nextCandidateHash);
       setReceipt(logEntry);
-      setStatus(match ? "Document matches the trusted reference." : "Document does not match the trusted reference.");
-      if (onChain === null) {
-        setChainStatus("On-chain check unavailable. The local receipt still records the verification.");
-      } else if (onChain) {
-        setChainStatus("Trusted reference found on-chain.");
-      } else {
-        setChainStatus("Trusted reference is not registered on-chain yet.");
-      }
+      setStatus(match ? "Match." : "No match.");
+      setChainStatus(
+        onChain === null
+          ? "Chain check unavailable."
+          : onChain
+          ? "On-chain."
+          : "Not on-chain."
+      );
       setLogs((prev) => [logEntry, ...prev.filter((entry) => entry.id !== logEntry.id)].slice(0, 8));
     } catch (error) {
       console.error(error);
-      setStatus(error?.message || "Failed to verify the document.");
+      setStatus(error?.message || "Verification failed.");
     }
   };
 
@@ -132,30 +133,29 @@ export default function VerifyPage() {
     <div className="layout section">
       <div className="section-header">
         <div>
-          <p className="badge">Verification</p>
-          <h2 style={{ margin: 0 }}>Compare a document against a trusted reference</h2>
+          <p className="badge">Verify</p>
+          <h2 style={{ margin: 0 }}>Check a file</h2>
           <p className="muted" style={{ marginTop: "8px" }}>
-            Upload the file you want to check, choose the trusted source version, and BitEstate
-            will create a proof receipt for the result.
+            SHA256 match + Sepolia check.
           </p>
         </div>
-        <Link className="btn" to="/audit-trail">
-          View audit trail
+        <Link className="btn" to="/source-truth">
+          Upload source
         </Link>
       </div>
 
       {!references.length && (
         <div className="status" style={{ marginBottom: "16px" }}>
-          No trusted references exist yet.{" "}
-          <Link className="inline-link" to="/register">
-            Register one first.
+          No sources yet.{" "}
+          <Link className="inline-link" to="/source-truth">
+            Upload one now.
           </Link>
         </div>
       )}
 
       <div className="verify-grid">
         <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>1. Select the trusted reference</h3>
+          <h3 style={{ marginTop: 0 }}>Source</h3>
           <select
             className="select"
             value={selectedReferenceId}
@@ -169,7 +169,7 @@ export default function VerifyPage() {
             ))}
           </select>
 
-          {selectedReference && (
+          {selectedReference ? (
             <div className="reference-summary">
               <div className="receipt-top">
                 <div>
@@ -193,16 +193,19 @@ export default function VerifyPage() {
                 </div>
               </div>
               <p className="muted" style={{ marginBottom: 0 }}>
-                Registered by {selectedReference.uploadedByName || "Unknown"} on{" "}
-                {formatStamp(selectedReference.createdAt)}
+                Registered {formatStamp(selectedReference.createdAt)}
               </p>
+            </div>
+          ) : (
+            <div className="empty-state" style={{ marginTop: "16px" }}>
+              Add a source first.
             </div>
           )}
         </section>
 
         <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>2. Upload the document to verify</h3>
-          <label className="muted">Candidate file</label>
+          <h3 style={{ marginTop: 0 }}>File</h3>
+          <label className="muted">Document to check</label>
           <input
             type="file"
             accept="application/pdf,image/jpeg,image/png"
@@ -210,7 +213,7 @@ export default function VerifyPage() {
             onChange={(e) => setCandidateFile(e.target.files[0] || null)}
           />
           <button className="btn-primary btn" style={{ marginTop: "16px" }} onClick={handleVerify}>
-            Generate verification receipt
+            Check file
           </button>
           {status && <div className="status" style={{ marginTop: "12px" }}>{status}</div>}
           {chainStatus && <div className="status" style={{ marginTop: "8px" }}>{chainStatus}</div>}
@@ -218,7 +221,7 @@ export default function VerifyPage() {
             <div className="receipt-panel" style={{ marginTop: "16px" }}>
               <div className="receipt-top">
                 <div>
-                  <h4 style={{ margin: 0 }}>Proof receipt</h4>
+                  <h4 style={{ margin: 0 }}>Receipt</h4>
                   <p className="muted" style={{ margin: "4px 0 0" }}>
                     {receipt.match ? "Match" : "Mismatch"} | {formatStamp(receipt.createdAt)}
                   </p>
@@ -240,11 +243,11 @@ export default function VerifyPage() {
               <div className="receipt-grid">
                 <div>
                   <span className="label">Verified by</span>
-                  <div>{receipt.verifiedByName || "Unknown"}</div>
+                  <div>{receipt.verifiedByName || "Guest"}</div>
                 </div>
                 <div>
                   <span className="label">Reference</span>
-                  <div>{receipt.referenceTitle || "Untitled reference"}</div>
+                  <div>{receipt.referenceTitle || "Untitled"}</div>
                 </div>
               </div>
               <button
@@ -257,7 +260,7 @@ export default function VerifyPage() {
                       setCopyFeedback("receipt");
                       setTimeout(() => setCopyFeedback(""), 2000);
                     },
-                    () => setStatus("Failed to copy receipt hash.")
+                    () => setStatus("Copy failed.")
                   )
                 }
               >
@@ -271,8 +274,10 @@ export default function VerifyPage() {
       <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
         <div className="section-header">
           <div>
-            <h3 style={{ margin: 0 }}>Recent verification activity</h3>
-            <p className="muted">This is the audit trail that the plan says the product should keep.</p>
+            <h3 style={{ margin: 0 }}>Recent checks</h3>
+            <p className="muted" style={{ marginTop: "8px" }}>
+              Last few receipts created in the demo.
+            </p>
           </div>
         </div>
         <div className="stack">
@@ -281,9 +286,9 @@ export default function VerifyPage() {
               <article key={log.id} className="receipt-card">
                 <div className="receipt-top">
                   <div>
-                    <h4 style={{ margin: 0 }}>{log.referenceTitle || "Untitled reference"}</h4>
+                    <h4 style={{ margin: 0 }}>{log.referenceTitle || "Untitled"}</h4>
                     <p className="muted" style={{ margin: "4px 0 0" }}>
-                      {log.documentType || "Document"} | {log.jurisdiction || "Unknown jurisdiction"}
+                      {log.documentType || "Document"} | {log.jurisdiction || "Unknown"}
                     </p>
                   </div>
                   <span className={`badge ${log.match ? "badge-good" : "badge-warn"}`}>
@@ -291,10 +296,10 @@ export default function VerifyPage() {
                   </span>
                 </div>
                 <p className="muted" style={{ margin: 0 }}>
-                  Candidate: {log.candidateFileName || "Uploaded file"}
+                  {log.candidateFileName || "Uploaded file"}
                 </p>
                 <p className="muted" style={{ margin: 0 }}>
-                  Verified by {log.verifiedByName || "Unknown"} on {formatStamp(log.createdAt)}
+                  {log.verifiedByName || "Guest"} | {formatStamp(log.createdAt)}
                 </p>
                 <div className="receipt-grid">
                   <div>
@@ -309,7 +314,7 @@ export default function VerifyPage() {
               </article>
             ))
           ) : (
-            <div className="empty-state">No verification activity yet.</div>
+            <div className="empty-state">No checks yet.</div>
           )}
         </div>
       </section>
