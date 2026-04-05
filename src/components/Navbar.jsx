@@ -26,11 +26,11 @@ export default function Navbar() {
           Source
         </NavLink>
         <NavLink
-          to="/marketplace"
+          to="/preview"
           className={({ isActive }) => `tab-link tab-link-locked${isActive ? " active" : ""}`}
           title="Locked preview"
         >
-          Marketplace
+          Preview
         </NavLink>
       </div>
 

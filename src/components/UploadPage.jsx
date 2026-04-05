@@ -234,7 +234,7 @@ export default function UploadPage() {
       <div className="section-header">
         <div>
           <p className="badge">Source</p>
-          <h2 style={{ margin: 0 }}>Upload a source</h2>
+          <h2 style={{ margin: 0 }}>Register a source</h2>
           <p className="muted" style={{ marginTop: "8px" }}>
             Device code + wallet + Sepolia.
           </p>

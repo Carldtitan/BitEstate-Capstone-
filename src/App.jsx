@@ -32,8 +32,9 @@ export default function App() {
               <Route path="/register" element={<Navigate to="/source-truth" replace />} />
               <Route path="/upload" element={<Navigate to="/source-truth" replace />} />
               <Route path="/audit-trail" element={<Navigate to="/verify" replace />} />
-              <Route path="/listings" element={<Navigate to="/marketplace" replace />} />
-              <Route path="/marketplace" element={<ComingSoonPage />} />
+              <Route path="/listings" element={<Navigate to="/preview" replace />} />
+              <Route path="/preview" element={<ComingSoonPage />} />
+              <Route path="/marketplace" element={<Navigate to="/preview" replace />} />
               <Route path="/list-property" element={<Navigate to="/source-truth" replace />} />
               <Route path="/my-properties" element={<Navigate to="/verify" replace />} />
               <Route

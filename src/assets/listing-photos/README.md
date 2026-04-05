@@ -1,6 +1,6 @@
 # Listing Photos
 
-This folder contains the stock photos used by the locked marketplace preview.
+This folder contains the stock photos used by the locked preview.
 
 ## Setup Instructions
 
