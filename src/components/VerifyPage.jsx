@@ -67,7 +67,7 @@ export default function VerifyPage() {
 
   const handleVerify = async () => {
     if (!selectedReference) {
-      setStatus("Upload a source first.");
+      setStatus("Register a source first.");
       return;
     }
     if (!candidateFile) {
@@ -140,7 +140,7 @@ export default function VerifyPage() {
           </p>
         </div>
         <Link className="btn" to="/source-truth">
-          Upload source
+          Register source
         </Link>
       </div>
 
@@ -148,7 +148,7 @@ export default function VerifyPage() {
         <div className="status" style={{ marginBottom: "16px" }}>
           No sources yet.{" "}
           <Link className="inline-link" to="/source-truth">
-            Upload one now.
+            Register one now.
           </Link>
         </div>
       )}

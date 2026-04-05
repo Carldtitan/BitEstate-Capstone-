@@ -13,7 +13,7 @@ export default function Footer() {
               <h3>BitEstate</h3>
             </div>
             <p>
-              Live demo for SHA256 checks, Sepolia writes, and a locked marketplace preview.
+              Live demo for SHA256 checks, Sepolia writes, and approved source uploads.
             </p>
           </div>
 
@@ -23,7 +23,7 @@ export default function Footer() {
               <li><Link to="/">Home</Link></li>
               <li><Link to="/verify">Verify</Link></li>
               <li><Link to="/source-truth">Source</Link></li>
-              <li><Link to="/marketplace">Marketplace</Link></li>
+              <li><Link to="/preview">Preview</Link></li>
             </ul>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p>&copy; {currentYear} BitEstate. All rights reserved.</p>
-          <p className="footer-tagline">SHA256, Sepolia, and a frozen marketplace preview.</p>
+          <p className="footer-tagline">SHA256, Sepolia, and receipts.</p>
         </div>
       </div>
     </footer>

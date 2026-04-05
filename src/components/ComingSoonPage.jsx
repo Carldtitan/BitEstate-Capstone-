@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import listings from "../data/listings";
 import ImageWithFallback from "./ImageWithFallback";
 
@@ -12,14 +13,18 @@ function formatPrice(value) {
 }
 
 export default function ComingSoonPage() {
+  useEffect(() => {
+    document.title = "BitEstate | Preview";
+  }, []);
+
   return (
     <div className="layout section">
       <div className="section-header">
         <div>
-          <p className="badge">Marketplace</p>
-          <h2 style={{ margin: 0 }}>Coming soon</h2>
+          <p className="badge">Preview</p>
+          <h2 style={{ margin: 0 }}>Locked preview</h2>
           <p className="muted" style={{ marginTop: "8px" }}>
-            Preview only. Nothing here is live.
+            Visible only. Controls are disabled.
           </p>
         </div>
       </div>
@@ -54,7 +59,7 @@ export default function ComingSoonPage() {
         </div>
 
         <div className="marketplace-overlay">
-          <p className="badge">Locked preview</p>
+          <p className="badge">Preview only</p>
           <h3 style={{ margin: "8px 0 6px" }}>Browse disabled</h3>
           <p className="muted" style={{ margin: 0 }}>
             The layout stays visible. The controls do not work.
