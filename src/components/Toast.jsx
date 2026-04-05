@@ -1,38 +1,22 @@
-export function Toast({ id, message, type = "info", onClose }) {
+export default function Toast({ message, type = "info", onClose }) {
+  const iconMap = {
+    success: "OK",
+    error: "ERR",
+    warning: "WARN",
+    info: "INFO",
+  };
+
   return (
-    <div className={`toast toast-${type}`} key={id}>
+    <div className={`toast toast-${type}`}>
       <div className="toast-content">
-        <span className="toast-icon">
-          {type === "success" && "✓"}
-          {type === "error" && "✕"}
-          {type === "warning" && "⚠"}
-          {type === "info" && "ℹ"}
-        </span>
+        <span className="toast-icon">{iconMap[type] || "INFO"}</span>
         <span>{message}</span>
       </div>
-      <button
-        className="toast-close"
-        onClick={() => onClose(id)}
-        aria-label="Close notification"
-      >
-        ×
-      </button>
-    </div>
-  );
-}
-
-export function ToastContainer({ toasts, onClose }) {
-  return (
-    <div className="toast-container">
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          id={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={onClose}
-        />
-      ))}
+      {onClose && (
+        <button className="toast-close" onClick={onClose} aria-label="Close">
+          x
+        </button>
+      )}
     </div>
   );
 }

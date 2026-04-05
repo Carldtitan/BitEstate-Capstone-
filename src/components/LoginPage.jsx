@@ -41,8 +41,8 @@ export default function LoginPage() {
       <div className="form-card" style={{ maxWidth: "520px" }}>
         <h2 style={{ margin: "0 0 10px" }}>Sign in to BitEstate</h2>
         <p className="muted">
-          Use your Google account. If Firebase is not configured, this will fall back to a local demo
-          session.
+          Use your Google account to access the verification workflow. If Firebase is not
+          configured, the app falls back to a local demo session.
         </p>
         {error && (
           <div className="error" style={{ marginTop: "12px", padding: "10px 12px" }}>

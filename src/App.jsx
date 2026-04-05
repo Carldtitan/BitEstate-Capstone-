@@ -5,11 +5,10 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HomePage from "./components/HomePage";
 import VerifyPage from "./components/VerifyPage";
-import ListingsPage from "./components/ListingsPage";
-import ListPropertyPage from "./components/ListPropertyPage";
+import ComingSoonPage from "./components/ComingSoonPage";
 import UploadPage from "./components/UploadPage";
 import LoginPage from "./components/LoginPage";
-import MyPropertiesPage from "./components/MyPropertiesPage";
+import AuditTrailPage from "./components/AuditTrailPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { WalletProvider } from "./context/WalletContext";
 
@@ -46,37 +45,26 @@ export default function App() {
                 }
               />
               <Route
-                path="/listings"
+                path="/audit-trail"
                 element={
                   <Protected>
-                    <ListingsPage />
+                    <AuditTrailPage />
                   </Protected>
                 }
               />
               <Route
-                path="/list-property"
-                element={
-                  <Protected>
-                    <ListPropertyPage />
-                  </Protected>
-                }
-              />
-              <Route
-                path="/my-properties"
-                element={
-                  <Protected>
-                    <MyPropertiesPage />
-                  </Protected>
-                }
-              />
-              <Route
-                path="/upload"
+                path="/register"
                 element={
                   <AdminProtected>
                     <UploadPage />
                   </AdminProtected>
                 }
               />
+              <Route path="/upload" element={<Navigate to="/register" replace />} />
+              <Route path="/listings" element={<ComingSoonPage />} />
+              <Route path="/marketplace" element={<ComingSoonPage />} />
+              <Route path="/list-property" element={<Navigate to="/register" replace />} />
+              <Route path="/my-properties" element={<Navigate to="/audit-trail" replace />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

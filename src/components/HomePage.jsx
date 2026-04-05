@@ -1,275 +1,315 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import listings from "../data/listings";
-import { getListing } from "../contract.js";
-import { getRandomListingPhoto } from "../utils/listingPhotos";
-import ImageWithFallback from "./ImageWithFallback";
-import CowrieLogo from "./CowrieeLogo";
-import { db } from "../services/firebaseClient";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  listTrustedReferences,
+  listVerificationLogs,
+} from "../services/bitestateStore";
+
+function shortHash(value) {
+  if (!value) return "-";
+  return value.length > 18 ? `${value.slice(0, 10)}...${value.slice(-6)}` : value;
+}
+
+function formatStamp(value) {
+  if (!value) return "Unknown";
+  try {
+    return new Date(value).toLocaleString();
+  } catch {
+    return value;
+  }
+}
 
 export default function HomePage() {
-  const [statusMap, setStatusMap] = useState({});
-  const [allListings, setAllListings] = useState([]);
-  const [featured, setFeatured] = useState([]);
+  const [references, setReferences] = useState([]);
+  const [logs, setLogs] = useState([]);
 
-  // Load custom listings from Firestore
   useEffect(() => {
-    const loadCustomListings = async () => {
-      try {
-        const snap = await getDocs(collection(db, "listings"));
-        const customListings = snap.docs.map((d) => {
-          const data = d.data();
-          const numId = Number(data.contractId ?? data.id);
-          const resolvedId = Number.isFinite(numId) ? numId : d.id;
-          const asStr = data.image ? String(data.image).trim() : "";
-          const isLocalListingPhoto = asStr.startsWith("/listing-photos/") || asStr.startsWith("listing-photos/");
-          const looksLikeImageUrl = /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr) || /^https?:\/\/.+\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(asStr);
-          const imgFromDb = isLocalListingPhoto || looksLikeImageUrl ? asStr : null;
-          return {
-            id: resolvedId,
-            docId: d.id,
-            image: imgFromDb || getRandomListingPhoto(resolvedId),
-            fromDb: true,
-            ...data,
-          };
-        });
-        // Merge custom listings with mock data, avoiding duplicates
-        const mergedListings = [
-          ...customListings,
-          ...listings.filter((mockListing) => !customListings.some((custom) => custom.id === mockListing.id)),
-        ];
-        setAllListings(mergedListings);
-        setFeatured(mergedListings.slice(0, 2));
-      } catch (err) {
-        console.warn("Failed to load custom listings", err);
-        setFeatured(listings.slice(0, 2));
-      }
-    };
-    loadCustomListings();
+    document.title = "BitEstate | Document verification for title and settlement teams";
   }, []);
 
-  // Load on-chain status for featured listings
   useEffect(() => {
-    if (featured.length === 0) return;
     const load = async () => {
       try {
-        const results = await Promise.all(featured.map((l) => getListing(l.id)));
-        const map = {};
-        featured.forEach((l, idx) => {
-          map[l.id] = results[idx];
-        });
-        setStatusMap(map);
-      } catch (err) {
-        console.warn("Failed to load listing status", err);
+        const [nextReferences, nextLogs] = await Promise.all([
+          listTrustedReferences({ limit: 4 }),
+          listVerificationLogs({ limit: 4 }),
+        ]);
+        setReferences(nextReferences);
+        setLogs(nextLogs);
+      } catch (error) {
+        console.warn("Failed to load home data", error);
       }
     };
     load();
-  }, [featured]);
+  }, []);
+
+  const heroStats = useMemo(
+    () => [
+      { label: "Trusted references", value: references.length.toString().padStart(2, "0") },
+      { label: "Verification receipts", value: logs.length.toString().padStart(2, "0") },
+      { label: "Initial market", value: "California" },
+    ],
+    [references.length, logs.length]
+  );
+
+  const workflow = [
+    {
+      title: "Register the trusted source",
+      text: "An admin signs in, connects a wallet, and registers the source document hash on Sepolia.",
+    },
+    {
+      title: "Compare the candidate file",
+      text: "A signed-in user uploads the file they want to check and BitEstate compares it to the reference hash.",
+    },
+    {
+      title: "Store the proof receipt",
+      text: "The app writes who verified what, when, and whether it matched into the audit trail.",
+    },
+  ];
+
+  const scopeCards = [
+    {
+      title: "What is live now",
+      text: "Google sign-in, trusted reference registration, file verification, proof receipts, and audit logs.",
+    },
+    {
+      title: "What is intentionally excluded",
+      text: "BitEstate does not replace county recording, determine ownership, or run the transaction itself.",
+    },
+    {
+      title: "Marketplace",
+      text: "Buying and selling flows are preserved as a Coming Soon section while the pilot stays focused.",
+      link: "/marketplace",
+    },
+  ];
 
   return (
     <div className="layout">
       <section className="hero">
-        <div className="hero-card">
-          <p className="badge">Blockchain-verified property titles</p>
-          <h1 className="hero-title">Buy with confidence. Sell with clarity.</h1>
+        <div className="hero-card hero-copy">
+          <p className="badge">Title and settlement workflow</p>
+          <h1 className="hero-title">Document verification built for controlled closing files.</h1>
           <p className="hero-subtitle">
-            BitEstate verifies property documents on the blockchain, eliminating fraud and speeding up transactions. Browse verified listings, compare documents, and complete purchases in minutes.
+            BitEstate narrows the real estate problem down to one clear job: register a trusted
+            source, verify a candidate document against that source, and preserve a proof receipt
+            for the file operator.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link to="/verify" className="btn-primary btn">
-              Verify Documents
+              Verify a document
             </Link>
-            <Link to="/listings" className="btn">
-              Browse Listings
+            <Link to="/register" className="btn">
+              Register trusted reference
+            </Link>
+            <Link to="/audit-trail" className="btn">
+              Audit trail
             </Link>
           </div>
           <div className="stat-band">
-            <div className="stat">
-              <span>Document verification</span>
-              <strong>SHA-256 hashing</strong>
-            </div>
-            <div className="stat">
-              <span>Blockchain secured</span>
-              <strong>Tamper-proof</strong>
-            </div>
-            <div className="stat">
-              <span>Fast transactions</span>
-              <strong>On-chain purchases</strong>
-            </div>
+            {heroStats.map((stat) => (
+              <div className="stat" key={stat.label}>
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="hero-card">
-          <img
-            src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
-            alt="Trusted real estate marketplace"
-            style={{ width: "100%", borderRadius: "14px" }}
-          />
-          <p className="muted" style={{ marginTop: "10px" }}>
-            Verified property listings with cryptographic authenticity.
-          </p>
+
+        <div className="hero-card hero-side">
+          <div className="mini-panel">
+            <p className="badge" style={{ marginBottom: "10px" }}>
+              Current release
+            </p>
+            <h3 style={{ marginTop: 0 }}>A document-first product, not a marketplace demo.</h3>
+            <p className="muted">
+              The business plan now centers on California title and settlement operators, proof
+              receipts, and an audit trail that can be reviewed later.
+            </p>
+          </div>
+          <div className="workflow-list">
+            <div className="workflow-step">
+              <span>1</span>
+              <div>
+                <strong>Trusted reference</strong>
+                <p>Registered by an admin on a controlled path.</p>
+              </div>
+            </div>
+            <div className="workflow-step">
+              <span>2</span>
+              <div>
+                <strong>Verification</strong>
+                <p>Candidate file compared to the source hash.</p>
+              </div>
+            </div>
+            <div className="workflow-step">
+              <span>3</span>
+              <div>
+                <strong>Receipt</strong>
+                <p>Who verified what, and when, is retained in the log.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="section">
         <div className="section-header">
           <div>
-            <h3 style={{ margin: 0 }}>Featured homes</h3>
-            <p className="muted">Pre-checked titles and ready for the next owner</p>
+            <h2 style={{ margin: 0 }}>How it works</h2>
+            <p className="muted" style={{ marginTop: "8px" }}>
+              The app now follows the same structure as the writeup.
+            </p>
           </div>
-          <Link to="/listings" className="btn">
-            View all
-          </Link>
         </div>
         <div className="grid">
-          {featured.map((home) => (
-            <div key={home.id} className="card">
-              <ImageWithFallback src={home.image} listingId={home.id} alt={home.title} />
+          {workflow.map((item, index) => (
+            <div key={item.title} className="card feature-card">
+              <div className="feature-icon">{index + 1}</div>
+              <h4>{item.title}</h4>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-header">
+          <div>
+            <h2 style={{ margin: 0 }}>Scope and positioning</h2>
+            <p className="muted" style={{ marginTop: "8px" }}>
+              The product is intentionally narrower than the original marketplace concept.
+            </p>
+          </div>
+        </div>
+        <div className="grid">
+          {scopeCards.map((item) => (
+            <div key={item.title} className="card">
               <div className="card-body">
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
-                  <h4 style={{ margin: 0 }}>{home.title}</h4>
-                  <span className="badge">
-                    {statusMap[home.id]?.sold
-                      ? "Sold"
-                      : statusMap[home.id]?.exists
-                      ? "Verified"
-                      : "Pending"}
-                  </span>
-                </div>
+                <p className="badge" style={{ width: "fit-content" }}>
+                  {item.title}
+                </p>
                 <p className="muted" style={{ margin: 0 }}>
-                  {home.city}
+                  {item.text}
                 </p>
-                <p style={{ margin: "4px 0 0" }}>
-                  ${home.priceUsd.toLocaleString()} · {home.beds} beds · {home.baths} baths
-                </p>
-                <span className="pill">
-                  {statusMap[home.id]?.exists ? "Verified title" : "Awaiting verification"}
-                </span>
+                {item.link && (
+                  <Link to={item.link} className="inline-link" style={{ marginTop: "6px" }}>
+                    View the Coming Soon marketplace
+                  </Link>
+                )}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="section">
         <div className="section-header">
           <div>
-            <h2 style={{ margin: 0 }}>Why choose BitEstate?</h2>
+            <h2 style={{ margin: 0 }}>Recent proof receipts</h2>
             <p className="muted" style={{ marginTop: "8px" }}>
-              Industry-leading security and speed for real estate transactions
+              Latest entries from the local audit log.
             </p>
           </div>
+          <Link to="/audit-trail" className="btn">
+            Open audit trail
+          </Link>
         </div>
         <div className="grid">
-          <div className="card feature-card">
-            <div className="feature-icon">🔐</div>
-            <h4>Blockchain Security</h4>
-            <p>Immutable records prevent title fraud and disputes</p>
-          </div>
-          <div className="card feature-card">
-            <div className="feature-icon">⚡</div>
-            <h4>Lightning Fast</h4>
-            <p>Complete transactions in minutes, not weeks</p>
-          </div>
-          <div className="card feature-card">
-            <div className="feature-icon">✓</div>
-            <h4>Verified Documents</h4>
-            <p>SHA-256 hashes prove authenticity and integrity</p>
-          </div>
-          <div className="card feature-card">
-            <div className="feature-icon">💰</div>
-            <h4>Lower Costs</h4>
-            <p>Skip intermediaries and reduce transaction fees</p>
-          </div>
+          {logs.length ? (
+            logs.map((log) => (
+              <div key={log.id} className="card">
+                <div className="card-body">
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <h4 style={{ margin: 0 }}>{log.referenceTitle || "Untitled reference"}</h4>
+                    <span className={`badge ${log.match ? "badge-good" : "badge-warn"}`}>
+                      {log.match ? "Match" : "Mismatch"}
+                    </span>
+                  </div>
+                  <p className="muted" style={{ margin: 0 }}>
+                    {log.documentType || "Document"} | {log.jurisdiction || "Unknown jurisdiction"}
+                  </p>
+                  <p className="muted" style={{ margin: 0 }}>
+                    Verified by {log.verifiedByName || "Unknown"} on {formatStamp(log.createdAt)}
+                  </p>
+                  <div className="receipt-grid">
+                    <div>
+                      <span className="label">Candidate hash</span>
+                      <div className="mono">{shortHash(log.candidateHash)}</div>
+                    </div>
+                    <div>
+                      <span className="label">Receipt hash</span>
+                      <div className="mono">{shortHash(log.receiptHash)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="card">
+              <div className="card-body">
+                <h4 style={{ marginTop: 0 }}>No receipts yet</h4>
+                <p className="muted" style={{ margin: 0 }}>
+                  Register a trusted reference first, then verify a document to create the first
+                  receipt.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Trust Section */}
       <section className="section">
         <div className="section-header">
           <div>
-            <h2 style={{ margin: 0 }}>Trusted by property owners</h2>
+            <h2 style={{ margin: 0 }}>Trusted references</h2>
             <p className="muted" style={{ marginTop: "8px" }}>
-              Join thousands of users securing their real estate with blockchain
+              Controlled source documents currently available for verification.
             </p>
           </div>
-        </div>
-        <div className="testimonials">
-          <div className="testimonial-card">
-            <div className="stars">★★★★★</div>
-            <p>"BitEstate made selling my property incredibly smooth. The blockchain verification gave me peace of mind."</p>
-            <div className="testimonial-author">
-              <div className="avatar">A</div>
-              <div>
-                <strong>Amina</strong>
-                <small>Property Seller</small>
-              </div>
-            </div>
-          </div>
-          <div className="testimonial-card">
-            <div className="stars">★★★★★</div>
-            <p>"As a buyer, I appreciate the transparency. No hidden issues with verified documents on the blockchain."</p>
-            <div className="testimonial-author">
-              <div className="avatar">C</div>
-              <div>
-                <strong>Carlos</strong>
-                <small>Property Buyer</small>
-              </div>
-            </div>
-          </div>
-          <div className="testimonial-card">
-            <div className="stars">★★★★★</div>
-            <p>"The document verification feature saved us from a potential fraud. Highly recommended!"</p>
-            <div className="testimonial-author">
-              <div className="avatar">S</div>
-              <div>
-                <strong>Sylvia</strong>
-                <small>Real Estate Agent</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="section cta-section">
-        <h2>Ready to transform your real estate?</h2>
-        <p>Join BitEstate today and experience blockchain-powered property transactions</p>
-        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link to="/verify" className="btn-primary btn">
-            Start Verifying →
-          </Link>
-          <Link to="/listings" className="btn">
-            Browse Listings
+          <Link to="/register" className="btn-primary btn">
+            Add reference
           </Link>
         </div>
-      </section>
-
-      {/* Cowrie Currency Section */}
-      <section className="section">
-        <div className="section-header">
-          <div>
-            <h2 style={{ margin: 0 }}>Cowries: Your Real Estate Currency</h2>
-            <p className="muted">Trade properties with blockchain-backed digital currency</p>
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "40px", flexWrap: "wrap" }}>
-          <div style={{ flex: "0 0 auto" }}>
-            <CowrieLogo size={200} />
-          </div>
-          <div style={{ flex: "1", minWidth: "250px" }}>
-            <h3>Earn & Spend Cowries</h3>
-            <p>
-              Cowries are digital currency tokens backed by blockchain verification. List properties to earn Cowries, or use them to purchase verified real estate listings on BitEstate.
-            </p>
-            <ul style={{ marginTop: "12px", lineHeight: "1.8" }}>
-              <li>✓ Earn Cowries when you list properties</li>
-              <li>✓ Use Cowries to purchase verified listings</li>
-              <li>✓ Exchange with other users securely</li>
-              <li>✓ Track all transactions on-chain</li>
-            </ul>
-          </div>
+        <div className="grid">
+          {references.length ? (
+            references.map((reference) => (
+              <div key={reference.id} className="card">
+                <div className="card-body">
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <h4 style={{ margin: 0 }}>{reference.documentTitle}</h4>
+                    <span className={`badge ${reference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
+                      {reference.onChainTxHash ? "On-chain" : "Pending"}
+                    </span>
+                  </div>
+                  <p className="muted" style={{ margin: 0 }}>
+                    {reference.documentType} | {reference.jurisdiction}
+                  </p>
+                  <p className="muted" style={{ margin: 0 }}>
+                    Registered on {formatStamp(reference.createdAt)}
+                  </p>
+                  <div className="receipt-grid">
+                    <div>
+                      <span className="label">File hash</span>
+                      <div className="mono">{shortHash(reference.fileHash)}</div>
+                    </div>
+                    <div>
+                      <span className="label">Receipt hash</span>
+                      <div className="mono">{shortHash(reference.receiptHash)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="card">
+              <div className="card-body">
+                <h4 style={{ marginTop: 0 }}>No trusted references yet</h4>
+                <p className="muted" style={{ margin: 0 }}>
+                  Use the admin registration page to add the first source document.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
