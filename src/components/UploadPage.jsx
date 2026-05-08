@@ -237,10 +237,9 @@ export default function UploadPage() {
           <p className="badge">Source</p>
           <div className="title-row">
             <h1>Register source</h1>
-            <HelpTooltip>
-              Approved registry users unlock this page, connect a Sepolia wallet, and save a trusted file hash.
-            </HelpTooltip>
+            <HelpTooltip>Only the file hash is written. Do not upload private documents you are not allowed to handle.</HelpTooltip>
           </div>
+          <p className="page-note">Unlock, connect wallet, add source details, then save the hash.</p>
         </div>
       </div>
 

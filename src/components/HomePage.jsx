@@ -15,19 +15,19 @@ const steps = [
   {
     number: "01",
     title: "Verify",
-    text: "Upload the file you received and compare its SHA256 fingerprint with a trusted reference.",
+    text: "Upload the document you received.",
     link: "/verify",
   },
   {
     number: "02",
     title: "Source",
-    text: "A registry user signs in, unlocks the write path, and stores the trusted source hash.",
+    text: "Compare it with a registered source hash.",
     link: "/source-truth",
   },
   {
     number: "03",
     title: "Receipt",
-    text: "Every match or mismatch creates a receipt that shows what was checked and when.",
+    text: "Save the match or mismatch receipt.",
     link: "/verify",
   },
 ];
@@ -36,23 +36,23 @@ const controls = [
   {
     icon: FileSearch,
     badge: "Hash check",
-    title: "Compare the file",
+    title: "Hash check",
     text:
-      "BitEstate reads the uploaded file in the browser and turns it into a SHA256 fingerprint. If the fingerprint equals the trusted source hash, the file has not changed.",
+      "BitEstate creates a SHA256 fingerprint from the file. The same file gives the same hash. Any edit gives a different hash.",
   },
   {
     icon: DatabaseZap,
     badge: "Source write",
-    title: "Register the source",
+    title: "Source write",
     text:
-      "An approved account uses the Source page to save the official document hash. The demo writes that hash to Sepolia and keeps the source details in the browser.",
+      "A registry user saves the official document hash to Sepolia. That source becomes the record other files are checked against.",
   },
   {
     icon: ReceiptText,
     badge: "Receipt log",
-    title: "Keep the proof",
+    title: "Receipt log",
     text:
-      "A receipt records the candidate hash, source title, result, reviewer, and time. It gives the demo an audit trail without exposing the original document.",
+      "Each check records the source, candidate hash, result, reviewer, and time. Use it as proof of what was checked.",
   },
 ];
 
@@ -60,18 +60,20 @@ const entryCards = [
   {
     icon: ShieldCheck,
     label: "For reviewers",
-    title: "Check a document you were given",
-    text: "Start here when you need to confirm a file matches a trusted title, deed, or closing document.",
-    cta: "Open verifier",
+    title: "Verify a file",
+    text: "Use this when someone sends you a deed, title file, or closing document.",
+    cta: "Check file",
     to: "/verify",
+    image: "/brand/real-estate-documents.jpg",
   },
   {
     icon: LockKeyhole,
     label: "For registry users",
-    title: "Create the trusted reference",
-    text: "Use this path only when the source document is final and ready to become the comparison point.",
-    cta: "Open registry",
+    title: "Register a source",
+    text: "Use this when the official document is final and ready to become the trusted record.",
+    cta: "Register source",
     to: "/source-truth",
+    image: "/brand/modern-home.jpg",
   },
 ];
 
@@ -84,35 +86,47 @@ export default function HomePage() {
     <div className="layout section home-page">
       <section className="home-hero">
         <div className="hero-copy">
-          <p className="badge">Live document registry</p>
-          <h1>Verify files against trusted source records.</h1>
-          <p>
-            BitEstate turns real estate documents into secure fingerprints, checks them against
-            registered source hashes, and creates receipts for every review.
-          </p>
-          <div className="home-tags" aria-label="Platform tags">
-            <span className="pill">
-              <Fingerprint size={14} aria-hidden="true" />
-              SHA256
-            </span>
-            <span className="pill">Sepolia</span>
-            <span className="pill">Audit receipts</span>
+          <div className="hero-content">
+            <p className="badge">Document verification</p>
+            <h1>Check if a real estate file is authentic.</h1>
+            <p>
+              Upload a file. BitEstate compares its hash with a registered source and gives you a receipt.
+            </p>
+            <div className="home-tags" aria-label="Platform tags">
+              <span className="pill">
+                <Fingerprint size={14} aria-hidden="true" />
+                SHA256
+              </span>
+              <span className="pill">Sepolia</span>
+              <span className="pill">Receipts</span>
+            </div>
+          </div>
+          <div className="hero-image-card">
+            <img
+              src="/brand/real-estate-documents.jpg"
+              alt="Real estate documents and keys on a desk"
+            />
+            <div className="hero-image-caption">
+              <strong>File never needs to be read manually.</strong>
+              <span>The check is based on the document hash.</span>
+            </div>
           </div>
         </div>
 
         <div className="hero-panel">
           <div className="card-title-row">
             <div>
-              <p className="eyebrow">Choose a path</p>
-              <h2>Start with the job you need to finish</h2>
+              <p className="eyebrow">Start here</p>
+              <h2>Choose the correct task</h2>
             </div>
-            <HelpTooltip>Verifier is for checking a file. Registry is for creating the trusted source.</HelpTooltip>
+            <HelpTooltip>Use Verify for checking a file. Use Source only for creating the trusted record.</HelpTooltip>
           </div>
           <div className="entry-grid">
             {entryCards.map((card) => {
               const Icon = card.icon;
               return (
                 <Link key={card.title} to={card.to} className="entry-card">
+                  <img src={card.image} alt="" className="entry-card-image" />
                   <span className="entry-icon">
                     <Icon size={20} aria-hidden="true" />
                   </span>
@@ -134,8 +148,9 @@ export default function HomePage() {
         <div className="card-title-row">
           <div>
             <p className="eyebrow">Workflow</p>
-            <h2>How a document moves through BitEstate</h2>
+            <h2>Simple flow</h2>
           </div>
+          <HelpTooltip>The original file stays with the user. The app compares hashes and stores receipts.</HelpTooltip>
         </div>
         <div className="home-step-list">
           {steps.map((step) => (

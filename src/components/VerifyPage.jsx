@@ -136,12 +136,13 @@ export default function VerifyPage() {
         <div>
           <p className="badge">Verify</p>
           <div className="title-row">
-            <h1>Check file</h1>
-            <HelpTooltip>Upload a candidate file to compare it with a saved source hash.</HelpTooltip>
+            <h1>Verify document</h1>
+            <HelpTooltip>The file stays in your browser. BitEstate compares hashes, not document contents.</HelpTooltip>
           </div>
+          <p className="page-note">Select a source, upload a file, then check the result.</p>
         </div>
         <Link className="btn" to="/source-truth">
-          Source
+          Register source
         </Link>
       </div>
 
@@ -156,7 +157,7 @@ export default function VerifyPage() {
 
       <div className="verify-grid">
         <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>Source</h3>
+          <h3 style={{ marginTop: 0 }}>1. Source</h3>
           <select
             className="select"
             value={selectedReferenceId}
@@ -205,7 +206,7 @@ export default function VerifyPage() {
         </section>
 
         <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>File</h3>
+          <h3 style={{ marginTop: 0 }}>2. File</h3>
           <label className="muted">Document to check</label>
           <input
             type="file"
