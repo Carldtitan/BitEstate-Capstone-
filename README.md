@@ -12,3 +12,17 @@ BitEstate verifies real estate documents against registered source hashes.
 - Firebase Auth handles sign-in.
 - Firestore stores trusted source hashes and verification receipts.
 - Sepolia writes are optional. The app never stores the uploaded document file.
+
+## Firebase Setup
+
+Deploy the Firestore rules:
+
+```bash
+npm run firebase:deploy-rules
+```
+
+Remove the old listing-era collections:
+
+```bash
+npm run firebase:clear-old-data
+```
