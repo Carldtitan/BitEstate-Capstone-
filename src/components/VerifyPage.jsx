@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight, Clock3, Database, FileUp, ReceiptText, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { verifyHash } from "../contract.js";
 import { generateHash } from "../hash";
@@ -24,6 +25,21 @@ function formatStamp(value) {
   } catch {
     return value;
   }
+}
+
+function TaskHeader({ icon: Icon, step, title, text }) {
+  return (
+    <div className="task-card-header">
+      <span className="task-icon" aria-hidden="true">
+        <Icon size={19} />
+      </span>
+      <div>
+        <span className="step-label">{step}</span>
+        <h3>{title}</h3>
+        <p>{text}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function VerifyPage() {
@@ -120,8 +136,8 @@ export default function VerifyPage() {
         onChain === null
           ? "Chain check unavailable."
           : onChain
-          ? "On-chain."
-          : "Not on-chain."
+          ? "Source is on-chain."
+          : "Source is not on-chain."
       );
       setLogs((prev) => [logEntry, ...prev.filter((entry) => entry.id !== logEntry.id)].slice(0, 8));
     } catch (error) {
@@ -132,56 +148,69 @@ export default function VerifyPage() {
 
   return (
     <div className="layout section">
-      <div className="section-header">
+      <div className="section-header page-intro">
         <div>
           <p className="badge">Verify</p>
           <div className="title-row">
             <h1>Verify document</h1>
             <HelpTooltip>The file stays in your browser. BitEstate compares hashes, not document contents.</HelpTooltip>
           </div>
-          <p className="page-note">Select a source, upload a file, then check the result.</p>
+          <p className="page-note">Choose the trusted source, upload the file you received, then save the result.</p>
         </div>
-        <Link className="btn" to="/source-truth">
+        <Link className="btn page-action" to="/source-truth">
           Register source
+          <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
 
       {!references.length && (
-        <div className="status" style={{ marginBottom: "16px" }}>
-          No sources yet.{" "}
-          <Link className="inline-link" to="/source-truth">
-            Register one now.
+        <div className="notice-card">
+          <div>
+            <strong>No registered sources yet</strong>
+            <p>Verification needs one trusted source hash before a file can be checked.</p>
+          </div>
+          <Link className="btn-primary btn" to="/source-truth">
+            Register source
           </Link>
         </div>
       )}
 
-      <div className="verify-grid">
-        <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>1. Source</h3>
-          <select
-            className="select"
-            value={selectedReferenceId}
-            onChange={(e) => setSelectedReferenceId(e.target.value)}
-            disabled={!references.length}
-          >
-            {references.map((reference) => (
-              <option key={reference.id} value={reference.id}>
-                {reference.documentTitle} ({reference.documentType})
-              </option>
-            ))}
-          </select>
+      <div className="verify-grid task-grid">
+        <section className="form-card task-card">
+          <TaskHeader
+            icon={Database}
+            step="Step 1"
+            title="Select the trusted source"
+            text="This is the official hash the uploaded file will be compared against."
+          />
+          <div className="field-group">
+            <label className="field-label" htmlFor="reference-source">Source record</label>
+            <select
+              id="reference-source"
+              className="select"
+              value={selectedReferenceId}
+              onChange={(e) => setSelectedReferenceId(e.target.value)}
+              disabled={!references.length}
+            >
+              {references.map((reference) => (
+                <option key={reference.id} value={reference.id}>
+                  {reference.documentTitle} ({reference.documentType})
+                </option>
+              ))}
+            </select>
+          </div>
 
           {selectedReference ? (
             <div className="reference-summary">
               <div className="receipt-top">
                 <div>
-                  <h4 style={{ margin: 0 }}>{selectedReference.documentTitle}</h4>
-                  <p className="muted" style={{ margin: "4px 0 0" }}>
+                  <h4>{selectedReference.documentTitle}</h4>
+                  <p className="muted">
                     {selectedReference.documentType} | {selectedReference.jurisdiction}
                   </p>
                 </div>
                 <span className={`badge ${selectedReference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                  {selectedReference.onChainTxHash ? "On-chain" : "Pending"}
+                  {selectedReference.onChainTxHash ? "On-chain" : "Local source"}
                 </span>
               </div>
               <div className="receipt-grid">
@@ -194,37 +223,44 @@ export default function VerifyPage() {
                   <div className="mono">{shortHash(selectedReference.receiptHash)}</div>
                 </div>
               </div>
-              <p className="muted" style={{ marginBottom: 0 }}>
-                Registered {formatStamp(selectedReference.createdAt)}
-              </p>
+              <p className="muted">Registered {formatStamp(selectedReference.createdAt)}</p>
             </div>
           ) : (
-            <div className="empty-state" style={{ marginTop: "16px" }}>
-              Add a source first.
-            </div>
+            <div className="empty-state">Add a source first.</div>
           )}
         </section>
 
-        <section className="form-card">
-          <h3 style={{ marginTop: 0 }}>2. File</h3>
-          <label className="muted">Document to check</label>
-          <input
-            type="file"
-            accept="application/pdf,image/jpeg,image/png"
-            className="input"
-            onChange={(e) => setCandidateFile(e.target.files[0] || null)}
+        <section className="form-card task-card">
+          <TaskHeader
+            icon={FileUp}
+            step="Step 2"
+            title="Upload the file to check"
+            text="PDF, JPG, and PNG files are supported. The document itself is not uploaded to a server."
           />
-          <button className="btn-primary btn" style={{ marginTop: "16px" }} onClick={handleVerify}>
-            Check file
-          </button>
-          {status && <div className="status" style={{ marginTop: "12px" }}>{status}</div>}
-          {chainStatus && <div className="status" style={{ marginTop: "8px" }}>{chainStatus}</div>}
+          <div className="field-group">
+            <label className="field-label" htmlFor="candidate-file">Document file</label>
+            <input
+              id="candidate-file"
+              type="file"
+              accept="application/pdf,image/jpeg,image/png"
+              className="input"
+              onChange={(e) => setCandidateFile(e.target.files[0] || null)}
+            />
+          </div>
+          {candidateFile && <p className="helper-line">Ready to check: {candidateFile.name}</p>}
+          <div className="form-actions">
+            <button className="btn-primary btn" onClick={handleVerify}>
+              Check file
+            </button>
+          </div>
+          {status && <div className="status status-strong">{status}</div>}
+          {chainStatus && <div className="status">{chainStatus}</div>}
           {receipt && (
-            <div className="receipt-panel" style={{ marginTop: "16px" }}>
+            <div className="receipt-panel">
               <div className="receipt-top">
                 <div>
-                  <h4 style={{ margin: 0 }}>Receipt</h4>
-                  <p className="muted" style={{ margin: "4px 0 0" }}>
+                  <h4>Verification receipt</h4>
+                  <p className="muted">
                     {receipt.match ? "Match" : "Mismatch"} | {formatStamp(receipt.createdAt)}
                   </p>
                 </div>
@@ -240,12 +276,6 @@ export default function VerifyPage() {
                 <div>
                   <span className="label">Receipt hash</span>
                   <div className="mono">{shortHash(receipt.receiptHash)}</div>
-                </div>
-              </div>
-              <div className="receipt-grid">
-                <div>
-                  <span className="label">Verified by</span>
-                  <div>{receipt.verifiedByName || "Guest"}</div>
                 </div>
                 <div>
                   <span className="label">Reference</span>
@@ -273,45 +303,36 @@ export default function VerifyPage() {
         </section>
       </div>
 
-      <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
-        <div className="section-header">
-          <div>
-            <div className="card-title-row">
-              <h3 style={{ margin: 0 }}>Recent checks</h3>
-              <HelpTooltip>Verification receipts are stored locally in this browser.</HelpTooltip>
-            </div>
+      <section className="record-section">
+        <div className="section-header compact-header">
+          <div className="card-title-row card-title-row-left">
+            <ReceiptText size={20} aria-hidden="true" />
+            <h3>Recent checks</h3>
+            <HelpTooltip>Verification receipts are stored locally in this browser.</HelpTooltip>
           </div>
         </div>
-        <div className="stack">
+        <div className="record-list">
           {logs.length ? (
             logs.map((log) => (
-              <article key={log.id} className="receipt-card">
-                <div className="receipt-top">
+              <article key={log.id} className="record-card">
+                <div className="record-card-main">
                   <div>
-                    <h4 style={{ margin: 0 }}>{log.referenceTitle || "Untitled"}</h4>
-                    <p className="muted" style={{ margin: "4px 0 0" }}>
-                      {log.documentType || "Document"} | {log.jurisdiction || "Unknown"}
-                    </p>
+                    <h4>{log.referenceTitle || "Untitled"}</h4>
+                    <p>{log.candidateFileName || "Uploaded file"}</p>
                   </div>
                   <span className={`badge ${log.match ? "badge-good" : "badge-warn"}`}>
                     {log.match ? "Matched" : "Mismatch"}
                   </span>
                 </div>
-                <p className="muted" style={{ margin: 0 }}>
-                  {log.candidateFileName || "Uploaded file"}
-                </p>
-                <p className="muted" style={{ margin: 0 }}>
-                  {log.verifiedByName || "Guest"} | {formatStamp(log.createdAt)}
-                </p>
-                <div className="receipt-grid">
-                  <div>
-                    <span className="label">Candidate hash</span>
-                    <div className="mono">{shortHash(log.candidateHash)}</div>
-                  </div>
-                  <div>
-                    <span className="label">Receipt hash</span>
-                    <div className="mono">{shortHash(log.receiptHash)}</div>
-                  </div>
+                <div className="record-meta">
+                  <span>
+                    <Clock3 size={14} aria-hidden="true" />
+                    {formatStamp(log.createdAt)}
+                  </span>
+                  <span>
+                    <ShieldCheck size={14} aria-hidden="true" />
+                    {shortHash(log.receiptHash)}
+                  </span>
                 </div>
               </article>
             ))

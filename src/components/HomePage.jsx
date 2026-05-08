@@ -12,8 +12,8 @@ const entryCards = [
   {
     icon: ShieldCheck,
     label: "For reviewers",
-    title: "Verify a file",
-    text: "Use this when someone sends you a deed, title file, or closing document.",
+    title: "Verify a received file",
+    text: "Use this when a deed, title file, or closing document needs a trust check.",
     cta: "Check file",
     to: "/verify",
     image: "/brand/real-estate-documents.jpg",
@@ -21,8 +21,8 @@ const entryCards = [
   {
     icon: LockKeyhole,
     label: "For registry users",
-    title: "Register a source",
-    text: "Use this when the official document is final and ready to become the trusted record.",
+    title: "Register a trusted source",
+    text: "Use this when the official document is final and ready to become the record.",
     cta: "Register source",
     to: "/source-truth",
     image: "/brand/modern-home.jpg",
@@ -40,17 +40,17 @@ export default function HomePage() {
         <div className="hero-copy">
           <div className="hero-content">
             <p className="badge">Document verification</p>
-            <h1>Check if a real estate file is authentic.</h1>
+            <h1>Verify real estate documents without opening the file.</h1>
             <p>
-              Upload a file. BitEstate compares its hash with a registered source and gives you a receipt.
+              BitEstate compares a document fingerprint with a registered source hash, then creates a receipt for the review.
             </p>
             <div className="home-tags" aria-label="Platform tags">
               <span className="pill">
                 <Fingerprint size={14} aria-hidden="true" />
-                SHA256
+                Private hash check
               </span>
-              <span className="pill">Sepolia</span>
-              <span className="pill">Receipts</span>
+              <span className="pill">Source registry</span>
+              <span className="pill">Review receipt</span>
             </div>
           </div>
           <div className="hero-image-card">
@@ -59,8 +59,8 @@ export default function HomePage() {
               alt="Real estate documents and keys on a desk"
             />
             <div className="hero-image-caption">
-              <strong>File never needs to be read manually.</strong>
-              <span>The check is based on the document hash.</span>
+              <strong>Private by design.</strong>
+              <span>The app checks hashes, not the contents people can read.</span>
             </div>
           </div>
         </div>
@@ -69,9 +69,9 @@ export default function HomePage() {
           <div className="card-title-row">
             <div>
               <p className="eyebrow">Start here</p>
-              <h2>Choose the correct task</h2>
+              <h2>Choose the right path</h2>
             </div>
-            <HelpTooltip>Use Verify for checking a file. Use Source only for creating the trusted record.</HelpTooltip>
+            <HelpTooltip>Verify checks a received file. Source creates the trusted record used for comparison.</HelpTooltip>
           </div>
           <div className="entry-grid">
             {entryCards.map((card) => {

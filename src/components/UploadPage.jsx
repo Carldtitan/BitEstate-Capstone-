@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Clock3, DatabaseZap, FileUp, KeyRound, LockKeyhole, WalletCards } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useWallet } from "../context/WalletContext";
 import { generateHash } from "../hash";
@@ -30,6 +31,35 @@ function formatStamp(value) {
 function readUnlocked() {
   if (typeof window === "undefined") return false;
   return window.sessionStorage.getItem(UNLOCK_STORAGE_KEY) === "1";
+}
+
+function TaskHeader({ icon: Icon, step, title, text }) {
+  return (
+    <div className="task-card-header">
+      <span className="task-icon" aria-hidden="true">
+        <Icon size={19} />
+      </span>
+      <div>
+        <span className="step-label">{step}</span>
+        <h3>{title}</h3>
+        <p>{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function StatusTile({ icon: Icon, label, value, active }) {
+  return (
+    <div className={`status-tile${active ? " active" : ""}`}>
+      <span className="status-tile-icon" aria-hidden="true">
+        <Icon size={17} />
+      </span>
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+    </div>
+  );
 }
 
 export default function UploadPage() {
@@ -110,11 +140,11 @@ export default function UploadPage() {
     }
     if (code === DEVICE_CODE) {
       setUnlocked(true);
-      setUnlockStatus("Unlocked.");
+      setUnlockStatus("Access open.");
       return;
     }
     setUnlocked(false);
-    setUnlockStatus("Wrong code.");
+    setUnlockStatus("Code not recognized.");
   };
 
   const validate = () => {
@@ -221,7 +251,7 @@ export default function UploadPage() {
 
       setSavedReference(reference);
       setReferences((prev) => [reference, ...prev.filter((item) => item.id !== reference.id)]);
-      setStatus("Saved.");
+      setStatus("Source saved.");
     } catch (error) {
       console.error(error);
       setStatus(error?.message || "Save failed.");
@@ -232,176 +262,201 @@ export default function UploadPage() {
 
   return (
     <div className="layout section">
-      <div className="section-header">
+      <div className="section-header page-intro">
         <div>
           <p className="badge">Source</p>
           <div className="title-row">
             <h1>Register source</h1>
             <HelpTooltip>Only the file hash is written. Do not upload private documents you are not allowed to handle.</HelpTooltip>
           </div>
-          <p className="page-note">Unlock, connect wallet, add source details, then save the hash.</p>
+          <p className="page-note">Create the trusted record that future documents will be checked against.</p>
         </div>
       </div>
 
-      <div className="status" style={{ marginBottom: "16px" }}>
-        <div>{user ? `Signed in as ${user.displayName || user.email || "Registry user"}` : "Not signed in"}</div>
-        <div className="muted" style={{ marginTop: "6px" }}>
-          Wallet: {walletAddress ? shortHash(walletAddress) : "Not connected"} | Chain:{" "}
-          {walletAddress ? (networkOk ? "Sepolia" : "Wrong network") : "Not connected"}
-        </div>
-        <div style={{ marginTop: "10px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          {!user ? (
-            <button className="btn-primary btn" type="button" onClick={login}>
-              Sign in
-            </button>
-          ) : null}
-          <button className="btn" type="button" onClick={connectWallet}>
-            {walletAddress ? "Reconnect wallet" : "Connect wallet"}
+      <div className="source-status-grid">
+        <StatusTile
+          icon={CheckCircle2}
+          label="Account"
+          value={user ? "Signed in" : "Sign in required"}
+          active={Boolean(user)}
+        />
+        <StatusTile
+          icon={KeyRound}
+          label="Registry access"
+          value={unlocked ? "Unlocked" : "Locked"}
+          active={unlocked}
+        />
+        <StatusTile
+          icon={WalletCards}
+          label="Wallet"
+          value={walletAddress ? shortHash(walletAddress) : "Not connected"}
+          active={Boolean(walletAddress)}
+        />
+        <StatusTile
+          icon={DatabaseZap}
+          label="Network"
+          value={walletAddress ? (networkOk ? "Sepolia" : "Wrong network") : "Waiting"}
+          active={Boolean(walletAddress && networkOk)}
+        />
+      </div>
+
+      <div className="source-action-row">
+        {!user ? (
+          <button className="btn-primary btn" type="button" onClick={login}>
+            Sign in
           </button>
-          <span className={`badge ${isAdmin ? "badge-good" : "badge-warn"}`}>
-            {isAdmin ? "Registry account" : "Not approved"}
-          </span>
-          <span className={`badge ${unlocked ? "badge-good" : "badge-warn"}`}>
-            {unlocked ? "Unlocked" : "Locked"}
-          </span>
-        </div>
-        {walletError && <div className="error" style={{ marginTop: "10px" }}>{walletError}</div>}
+        ) : null}
+        <button className="btn" type="button" onClick={connectWallet}>
+          {walletAddress ? "Reconnect wallet" : "Connect wallet"}
+        </button>
+        {walletError && <div className="error inline-error">{walletError}</div>}
       </div>
 
-      <div className="form-card">
-        <div className="receipt-top">
-          <div>
-            <div className="card-title-row">
-              <h3 style={{ margin: 0 }}>Unlock</h3>
-              <HelpTooltip>Enter the registry device code before saving a source.</HelpTooltip>
+      <div className="source-workspace">
+        <section className="form-card task-card access-card">
+          <TaskHeader
+            icon={LockKeyhole}
+            step="Access"
+            title="Unlock source registration"
+            text="Source registration is limited to approved registry users."
+          />
+          <div className="gate-row">
+            <input
+              className="input gate-input"
+              type="password"
+              placeholder="Device code"
+              value={deviceCode}
+              onChange={(e) => setDeviceCode(e.target.value)}
+            />
+            <button type="button" className="btn-primary btn" onClick={handleUnlock}>
+              Unlock
+            </button>
+          </div>
+          {unlockStatus && <p className="helper-line">{unlockStatus}</p>}
+        </section>
+
+        <form className="form-card task-card source-form" onSubmit={handleSubmit}>
+          <TaskHeader
+            icon={FileUp}
+            step="Source details"
+            title="Save the trusted document hash"
+            text="Use final documents only. Any future file will be checked against this source."
+          />
+          <div className="form-grid">
+            <div className="field-group">
+              <label className="field-label" htmlFor="source-title">Source title</label>
+              <input
+                id="source-title"
+                className="input"
+                placeholder="Example: 123 Main St title commitment"
+                value={form.sourceTitle}
+                onChange={setField("sourceTitle")}
+              />
+              {errors.sourceTitle && <div className="error">{errors.sourceTitle}</div>}
+            </div>
+            <div className="field-group">
+              <label className="field-label" htmlFor="document-type">Document type</label>
+              <select
+                id="document-type"
+                className="select"
+                value={form.documentType}
+                onChange={setField("documentType")}
+              >
+                <option value="Title Commitment">Title Commitment</option>
+                <option value="Deed">Deed</option>
+                <option value="Settlement Instruction">Settlement Instruction</option>
+                <option value="Payoff Statement">Payoff Statement</option>
+                <option value="Wire Instruction">Wire Instruction</option>
+                <option value="Closing Package">Closing Package</option>
+                <option value="Other">Other</option>
+              </select>
+              {errors.documentType && <div className="error">{errors.documentType}</div>}
+            </div>
+            <div className="field-group">
+              <label className="field-label" htmlFor="jurisdiction">Jurisdiction</label>
+              <input
+                id="jurisdiction"
+                className="input"
+                placeholder="California"
+                value={form.jurisdiction}
+                onChange={setField("jurisdiction")}
+              />
+              {errors.jurisdiction && <div className="error">{errors.jurisdiction}</div>}
+            </div>
+            <div className="field-group">
+              <label className="field-label" htmlFor="version">Version</label>
+              <input
+                id="version"
+                className="input"
+                type="number"
+                min="1"
+                value={form.version}
+                onChange={setField("version")}
+              />
             </div>
           </div>
-          <span className={`badge ${unlocked ? "badge-good" : "badge-warn"}`}>
-            {unlocked ? "Open" : "Closed"}
-          </span>
-        </div>
-        <div className="gate-row">
-          <input
-            className="input gate-input"
-            type="password"
-            placeholder="Device code"
-            value={deviceCode}
-            onChange={(e) => setDeviceCode(e.target.value)}
-          />
-          <button type="button" className="btn-primary btn" onClick={handleUnlock}>
-            Unlock
-          </button>
-        </div>
-        {unlockStatus && (
-          <p className="muted" style={{ marginTop: "10px" }}>
-            {unlockStatus}
-          </p>
-        )}
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="source-notes">Notes</label>
+            <textarea
+              id="source-notes"
+              className="textarea"
+              placeholder="Optional internal note"
+              value={form.notes}
+              onChange={setField("notes")}
+            />
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="source-file">Source file</label>
+            <input
+              id="source-file"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              className="input"
+              onChange={(event) => {
+                const nextFile = event.target.files[0] || null;
+                setFile(nextFile);
+                setErrors((prev) => {
+                  const next = { ...prev };
+                  const fileError = validators.file(nextFile, ["application/pdf", "image/jpeg", "image/png"], 10);
+                  if (fileError) {
+                    next.file = fileError;
+                  } else {
+                    delete next.file;
+                  }
+                  return next;
+                });
+              }}
+            />
+            {file && <p className="helper-line">Ready to save: {file.name}</p>}
+            {errors.file && <div className="error">{errors.file}</div>}
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" className="btn-primary btn" disabled={!isReady}>
+              Save source on Sepolia
+            </button>
+          </div>
+          {!isReady && (
+            <p className="helper-line">
+              {user ? null : "Sign in. "}
+              {!isAdmin ? "Use a registry account. " : null}
+              {!unlocked ? "Unlock access. " : null}
+              {!walletAddress ? "Connect a wallet. " : null}
+              {!networkOk ? "Switch to Sepolia." : null}
+            </p>
+          )}
+          {status && <div className="status status-strong">{status}</div>}
+        </form>
       </div>
 
-      <form className="form-card" onSubmit={handleSubmit}>
-        <div className="form-grid">
-          <div>
-            <input
-              className="input"
-              placeholder="Source title *"
-              value={form.sourceTitle}
-              onChange={setField("sourceTitle")}
-            />
-            {errors.sourceTitle && <div className="error">{errors.sourceTitle}</div>}
-          </div>
-          <div>
-            <select
-              className="select"
-              value={form.documentType}
-              onChange={setField("documentType")}
-            >
-              <option value="Title Commitment">Title Commitment</option>
-              <option value="Deed">Deed</option>
-              <option value="Settlement Instruction">Settlement Instruction</option>
-              <option value="Payoff Statement">Payoff Statement</option>
-              <option value="Wire Instruction">Wire Instruction</option>
-              <option value="Closing Package">Closing Package</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.documentType && <div className="error">{errors.documentType}</div>}
-          </div>
-          <div>
-            <input
-              className="input"
-              placeholder="Jurisdiction *"
-              value={form.jurisdiction}
-              onChange={setField("jurisdiction")}
-            />
-            {errors.jurisdiction && <div className="error">{errors.jurisdiction}</div>}
-          </div>
-          <div>
-            <input
-              className="input"
-              type="number"
-              min="1"
-              placeholder="Version"
-              value={form.version}
-              onChange={setField("version")}
-            />
-          </div>
-        </div>
-
-        <textarea
-          className="textarea"
-          placeholder="Notes"
-          value={form.notes}
-          onChange={setField("notes")}
-        />
-
-        <div style={{ marginTop: "12px" }}>
-          <label className="muted" style={{ display: "block", marginBottom: "8px" }}>
-            File *
-          </label>
-          <input
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            className="input"
-            onChange={(event) => {
-              const nextFile = event.target.files[0] || null;
-              setFile(nextFile);
-              setErrors((prev) => {
-                const next = { ...prev };
-                const fileError = validators.file(nextFile, ["application/pdf", "image/jpeg", "image/png"], 10);
-                if (fileError) {
-                  next.file = fileError;
-                } else {
-                  delete next.file;
-                }
-                return next;
-              });
-            }}
-          />
-          {errors.file && <div className="error">{errors.file}</div>}
-        </div>
-
-        <button type="submit" className="btn-primary btn" style={{ marginTop: "16px" }} disabled={!isReady}>
-          Save source on Sepolia
-        </button>
-        {!isReady && (
-          <p className="muted" style={{ marginTop: "10px" }}>
-            {user ? null : "Sign in. "}
-            {!isAdmin ? "Use a registry account. " : null}
-            {!unlocked ? "Unlock the form. " : null}
-            {!walletAddress ? "Connect a wallet. " : null}
-            {!networkOk ? "Switch to Sepolia." : null}
-          </p>
-        )}
-      </form>
-
-      {status && <div className="status" style={{ marginTop: "10px" }}>{status}</div>}
-
       {savedReference && (
-        <section className="receipt-panel" style={{ marginTop: "16px" }}>
+        <section className="receipt-panel source-receipt">
           <div className="receipt-top">
             <div>
-              <h3 style={{ margin: 0 }}>Receipt</h3>
-              <p className="muted" style={{ margin: "4px 0 0" }}>
+              <h3>Source receipt</h3>
+              <p className="muted">
                 {savedReference.documentTitle} | {formatStamp(savedReference.createdAt)}
               </p>
             </div>
@@ -419,16 +474,6 @@ export default function UploadPage() {
             <div>
               <span className="label">Tx hash</span>
               <div className="mono">{shortHash(txHash)}</div>
-            </div>
-          </div>
-          <div className="receipt-grid">
-            <div>
-              <span className="label">Version</span>
-              <div>{savedReference.version || 1}</div>
-            </div>
-            <div>
-              <span className="label">Saved by</span>
-              <div>{savedReference.uploadedByName || "Signed-in user"}</div>
             </div>
           </div>
           <button
@@ -450,42 +495,36 @@ export default function UploadPage() {
         </section>
       )}
 
-      <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
-        <div className="section-header">
-          <div>
-            <div className="card-title-row">
-              <h3 style={{ margin: 0 }}>Recent sources</h3>
-              <HelpTooltip>Saved trusted references are stored in this browser.</HelpTooltip>
-            </div>
+      <section className="record-section">
+        <div className="section-header compact-header">
+          <div className="card-title-row card-title-row-left">
+            <DatabaseZap size={20} aria-hidden="true" />
+            <h3>Recent sources</h3>
+            <HelpTooltip>Saved trusted references are stored in this browser.</HelpTooltip>
           </div>
         </div>
-        <div className="stack">
+        <div className="record-list">
           {references.length ? (
             references.slice(0, 6).map((reference) => (
-              <article key={reference.id} className="reference-card">
-                <div className="receipt-top">
+              <article key={reference.id} className="record-card">
+                <div className="record-card-main">
                   <div>
-                    <h4 style={{ margin: 0 }}>{reference.documentTitle}</h4>
-                    <p className="muted" style={{ margin: "4px 0 0" }}>
-                      {reference.documentType} | {reference.jurisdiction}
-                    </p>
+                    <h4>{reference.documentTitle}</h4>
+                    <p>{reference.documentType} | {reference.jurisdiction}</p>
                   </div>
                   <span className={`badge ${reference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                    {reference.onChainTxHash ? "On-chain" : "Pending"}
+                    {reference.onChainTxHash ? "On-chain" : "Local source"}
                   </span>
                 </div>
-                <p className="muted" style={{ margin: 0 }}>
-                  Registered {formatStamp(reference.createdAt)}
-                </p>
-                <div className="receipt-grid">
-                  <div>
-                    <span className="label">File hash</span>
-                    <div className="mono">{shortHash(reference.fileHash)}</div>
-                  </div>
-                  <div>
-                    <span className="label">Receipt hash</span>
-                    <div className="mono">{shortHash(reference.receiptHash)}</div>
-                  </div>
+                <div className="record-meta">
+                  <span>
+                    <Clock3 size={14} aria-hidden="true" />
+                    {formatStamp(reference.createdAt)}
+                  </span>
+                  <span>
+                    <DatabaseZap size={14} aria-hidden="true" />
+                    {shortHash(reference.receiptHash)}
+                  </span>
                 </div>
               </article>
             ))

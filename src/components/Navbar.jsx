@@ -35,11 +35,11 @@ export default function Navbar() {
         </span>
         <span className="brand-copy">
           <strong>BitEstate</strong>
-          <small>Verification registry</small>
+          <small>Document verification</small>
         </span>
       </Link>
 
-      <div className="sidebar-label">Dashboard</div>
+      <div className="sidebar-label">Workspace</div>
       <div className="navbar-tabs">
         {navItems.map((item) => (
           <NavItem key={item.to} item={item} />
