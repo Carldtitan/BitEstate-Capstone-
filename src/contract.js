@@ -2,9 +2,13 @@ import { BrowserProvider, Contract, JsonRpcProvider } from "ethers";
 import abi from "./abi.json" assert { type: "json" };
 
 const CONTRACT_ADDRESS =
-  process.env.CONTRACT_ADDRESS || "0x526A718547c8C2b0074f03cEAdC4B50E4577AD5b";
+  process.env.REACT_APP_CONTRACT_ADDRESS ||
+  process.env.CONTRACT_ADDRESS ||
+  "0x526A718547c8C2b0074f03cEAdC4B50E4577AD5b";
 const RPC_URL =
-  process.env.RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/5bu5nKW6A7oFXnWSE7Hky";
+  process.env.REACT_APP_RPC_URL ||
+  process.env.RPC_URL ||
+  "https://eth-sepolia.g.alchemy.com/v2/5bu5nKW6A7oFXnWSE7Hky";
 
 function hasWallet() {
   return typeof window !== "undefined" && typeof window.ethereum !== "undefined";
@@ -29,7 +33,7 @@ async function connectContract() {
 }
 
 async function getReadContract() {
-  const provider = await getProvider();
+  const provider = RPC_URL ? new JsonRpcProvider(RPC_URL) : await getProvider();
   if (!provider) return null;
   return new Contract(CONTRACT_ADDRESS, abi, provider);
 }

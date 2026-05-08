@@ -1,18 +1,25 @@
+import { DEMO_REFERENCE } from "./demoData";
+
 const REFERENCES_KEY = "bitestate_trusted_references_v1";
 const VERIFICATION_LOGS_KEY = "bitestate_verification_logs_v1";
+const memoryStore = new Map();
 
 function readJson(key) {
   try {
-    if (typeof localStorage === "undefined") return [];
+    if (typeof localStorage === "undefined") return memoryStore.get(key) || [];
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return memoryStore.get(key) || [];
+    const parsed = JSON.parse(raw);
+    memoryStore.set(key, parsed);
+    return parsed;
   } catch (error) {
     console.warn(`Could not read ${key}`, error);
-    return [];
+    return memoryStore.get(key) || [];
   }
 }
 
 function writeJson(key, value) {
+  memoryStore.set(key, value);
   try {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem(key, JSON.stringify(value));
@@ -61,7 +68,9 @@ function sortNewest(first, second) {
 }
 
 export async function listTrustedReferences({ limit } = {}) {
-  const references = readJson(REFERENCES_KEY).map(normalizeReference).sort(sortNewest);
+  const stored = readJson(REFERENCES_KEY).map(normalizeReference);
+  const hasDemoReference = stored.some((reference) => reference.id === DEMO_REFERENCE.id);
+  const references = (hasDemoReference ? stored : [DEMO_REFERENCE, ...stored]).sort(sortNewest);
   return typeof limit === "number" ? references.slice(0, limit) : references;
 }
 

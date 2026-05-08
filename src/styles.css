@@ -822,6 +822,13 @@ button:disabled {
   font-weight: 600;
 }
 
+.notice-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .task-grid {
   gap: 20px;
 }
@@ -1509,6 +1516,11 @@ input[type="file"].input::file-selector-button {
 
   .notice-card,
   .record-card-main {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notice-actions {
     align-items: stretch;
     flex-direction: column;
   }

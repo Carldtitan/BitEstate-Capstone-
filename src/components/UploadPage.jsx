@@ -189,23 +189,6 @@ export default function UploadPage() {
       return;
     }
 
-    if (!walletAddress) {
-      const address = await connectWallet();
-      if (!address) {
-        setStatus(walletError || "Connect a wallet.");
-        return;
-      }
-    }
-
-    const chainId =
-      typeof window !== "undefined" && window.ethereum
-        ? await window.ethereum.request({ method: "eth_chainId" })
-        : "";
-    if (chainId !== SEPOLIA_CHAIN_ID) {
-      setStatus("Switch to Sepolia.");
-      return;
-    }
-
     setStatus("Hashing source...");
     setTxHash("");
     setReceiptHash("");
@@ -227,9 +210,29 @@ export default function UploadPage() {
 
       setFileHash(nextFileHash);
       setReceiptHash(nextReceiptHash);
-      setStatus("Writing to Sepolia...");
-      const nextTxHash = await logHash(nextFileHash);
-      setTxHash(nextTxHash);
+      let nextTxHash = "";
+      let onChainRegistered = false;
+
+      if (walletAddress && networkOk) {
+        try {
+          const chainId =
+            typeof window !== "undefined" && window.ethereum
+              ? await window.ethereum.request({ method: "eth_chainId" })
+              : "";
+          if (chainId === SEPOLIA_CHAIN_ID) {
+            setStatus("Writing to Sepolia...");
+            nextTxHash = await logHash(nextFileHash);
+            onChainRegistered = true;
+            setTxHash(nextTxHash);
+          }
+        } catch (error) {
+          console.warn("Sepolia write failed; saving local source", error);
+        }
+      }
+
+      if (!onChainRegistered) {
+        setStatus("Saving local source...");
+      }
 
       const reference = await saveTrustedReference({
         documentTitle: sanitizeText(form.sourceTitle),
@@ -241,7 +244,7 @@ export default function UploadPage() {
         fileHash: nextFileHash,
         receiptHash: nextReceiptHash,
         onChainTxHash: nextTxHash,
-        onChainRegistered: true,
+        onChainRegistered,
         uploadedByUid: user.uid,
         uploadedByName: user.displayName || "Signed-in user",
         uploadedByEmail: user.email || "",
@@ -251,14 +254,15 @@ export default function UploadPage() {
 
       setSavedReference(reference);
       setReferences((prev) => [reference, ...prev.filter((item) => item.id !== reference.id)]);
-      setStatus("Source saved.");
+      setStatus(onChainRegistered ? "Source saved on Sepolia." : "Source saved locally for this demo.");
     } catch (error) {
       console.error(error);
       setStatus(error?.message || "Save failed.");
     }
   };
 
-  const isReady = Boolean(user && isAdmin && unlocked && walletAddress && networkOk);
+  const isReady = Boolean(user && isAdmin && unlocked);
+  const canWriteOnChain = Boolean(walletAddress && networkOk);
 
   return (
     <div className="layout section">
@@ -289,14 +293,14 @@ export default function UploadPage() {
         <StatusTile
           icon={WalletCards}
           label="Wallet"
-          value={walletAddress ? shortHash(walletAddress) : "Not connected"}
+          value={walletAddress ? shortHash(walletAddress) : "Optional"}
           active={Boolean(walletAddress)}
         />
         <StatusTile
           icon={DatabaseZap}
-          label="Network"
-          value={walletAddress ? (networkOk ? "Sepolia" : "Wrong network") : "Waiting"}
-          active={Boolean(walletAddress && networkOk)}
+          label="Storage"
+          value={canWriteOnChain ? "Sepolia ready" : walletAddress ? "Switch network" : "Local ready"}
+          active={Boolean(canWriteOnChain || !walletAddress)}
         />
       </div>
 
@@ -434,19 +438,20 @@ export default function UploadPage() {
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="btn-primary btn" disabled={!isReady}>
-              Save source on Sepolia
-            </button>
-          </div>
-          {!isReady && (
-            <p className="helper-line">
-              {user ? null : "Sign in. "}
-              {!isAdmin ? "Use a registry account. " : null}
-              {!unlocked ? "Unlock access. " : null}
-              {!walletAddress ? "Connect a wallet. " : null}
-              {!networkOk ? "Switch to Sepolia." : null}
-            </p>
-          )}
+          <button type="submit" className="btn-primary btn" disabled={!isReady}>
+            {canWriteOnChain ? "Save source on Sepolia" : "Save source locally"}
+          </button>
+        </div>
+        {!isReady && (
+          <p className="helper-line">
+            {user ? null : "Sign in. "}
+            {!isAdmin ? "Use a registry account. " : null}
+            {!unlocked ? "Unlock access." : null}
+          </p>
+        )}
+        {isReady && !canWriteOnChain && (
+          <p className="helper-line">Wallet is optional. Connect a Sepolia wallet only if you want an on-chain write.</p>
+        )}
           {status && <div className="status status-strong">{status}</div>}
         </form>
       </div>
@@ -513,7 +518,7 @@ export default function UploadPage() {
                     <p>{reference.documentType} | {reference.jurisdiction}</p>
                   </div>
                   <span className={`badge ${reference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                    {reference.onChainTxHash ? "On-chain" : "Local source"}
+                    {reference.sample ? "Sample" : reference.onChainTxHash ? "On-chain" : "Local source"}
                   </span>
                 </div>
                 <div className="record-meta">

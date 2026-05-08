@@ -2,7 +2,7 @@ import crypto from "crypto-js";
 
 // Build a deterministic receipt hash from a file hash plus the most important metadata.
 // The shape is intentionally flexible so the same helper can support reference registration
-// and verification receipts without tying the app to one property-listing workflow.
+// and verification receipts without tying the app to one document workflow.
 export function buildRecordHash(fileHash, fields = {}) {
   const meta = {
     title: fields.title || fields.documentTitle || fields.propertyTitle || "",

@@ -11,6 +11,7 @@ import {
   listVerificationLogs,
   saveVerificationLog,
 } from "../services/bitestateStore";
+import { createDemoFile, DEMO_REFERENCE_ID } from "../services/demoData";
 import HelpTooltip from "./HelpTooltip";
 
 function shortHash(value) {
@@ -53,6 +54,7 @@ export default function VerifyPage() {
   const [candidateHash, setCandidateHash] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState("");
+  const [autoDemoRan, setAutoDemoRan] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -82,12 +84,17 @@ export default function VerifyPage() {
     [references, selectedReferenceId]
   );
 
-  const handleVerify = async () => {
-    if (!selectedReference) {
+  const hasUserReferences = useMemo(
+    () => references.some((reference) => !reference.sample),
+    [references]
+  );
+
+  const runVerification = async (reference, file) => {
+    if (!reference) {
       setStatus("Register a source first.");
       return;
     }
-    if (!candidateFile) {
+    if (!file) {
       setStatus("Choose a file.");
       return;
     }
@@ -97,27 +104,32 @@ export default function VerifyPage() {
     setReceipt(null);
 
     try {
-      const nextCandidateHash = await generateHash(candidateFile);
-      const match = nextCandidateHash === selectedReference.fileHash;
-      const onChain = selectedReference.onChainTxHash ? true : await verifyHash(selectedReference.fileHash);
+      const nextCandidateHash = await generateHash(file);
+      const match = nextCandidateHash === reference.fileHash;
+      const onChain =
+        reference.onChainRegistered === false
+          ? false
+          : reference.onChainTxHash
+          ? true
+          : await verifyHash(reference.fileHash);
       const verifiedByName = user?.displayName || user?.email || "Guest";
       const receiptHash = buildRecordHash(nextCandidateHash, {
-        title: selectedReference.documentTitle,
-        documentType: selectedReference.documentType,
-        jurisdiction: selectedReference.jurisdiction,
-        fileName: candidateFile.name,
-        sourceId: selectedReference.id,
+        title: reference.documentTitle,
+        documentType: reference.documentType,
+        jurisdiction: reference.jurisdiction,
+        fileName: file.name,
+        sourceId: reference.id,
         verifiedBy: verifiedByName,
         result: match ? "match" : "mismatch",
       });
 
       const logEntry = await saveVerificationLog({
-        referenceId: selectedReference.id,
-        referenceTitle: selectedReference.documentTitle,
-        referenceHash: selectedReference.fileHash,
-        documentType: selectedReference.documentType,
-        jurisdiction: selectedReference.jurisdiction,
-        candidateFileName: candidateFile.name,
+        referenceId: reference.id,
+        referenceTitle: reference.documentTitle,
+        referenceHash: reference.fileHash,
+        documentType: reference.documentType,
+        jurisdiction: reference.jurisdiction,
+        candidateFileName: file.name,
         candidateHash: nextCandidateHash,
         match,
         receiptHash,
@@ -137,7 +149,7 @@ export default function VerifyPage() {
           ? "Chain check unavailable."
           : onChain
           ? "Source is on-chain."
-          : "Source is not on-chain."
+          : "Local source checked."
       );
       setLogs((prev) => [logEntry, ...prev.filter((entry) => entry.id !== logEntry.id)].slice(0, 8));
     } catch (error) {
@@ -145,6 +157,31 @@ export default function VerifyPage() {
       setStatus(error?.message || "Verification failed.");
     }
   };
+
+  const handleVerify = async () => {
+    await runVerification(selectedReference, candidateFile);
+  };
+
+  const handleDemoCheck = async () => {
+    const demoReference = references.find((reference) => reference.id === DEMO_REFERENCE_ID) || references[0];
+    const demoFile = createDemoFile();
+    setSelectedReferenceId(demoReference?.id || "");
+    setCandidateFile(demoFile);
+    await runVerification(demoReference, demoFile);
+  };
+
+  useEffect(() => {
+    if (autoDemoRan || !references.length) return;
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("demo") !== "1") return;
+    setAutoDemoRan(true);
+    const demoReference = references.find((reference) => reference.id === DEMO_REFERENCE_ID) || references[0];
+    const demoFile = createDemoFile();
+    setSelectedReferenceId(demoReference?.id || "");
+    setCandidateFile(demoFile);
+    runVerification(demoReference, demoFile);
+  }, [autoDemoRan, references]);
 
   return (
     <div className="layout section">
@@ -163,15 +200,20 @@ export default function VerifyPage() {
         </Link>
       </div>
 
-      {!references.length && (
+      {!hasUserReferences && (
         <div className="notice-card">
           <div>
-            <strong>No registered sources yet</strong>
-            <p>Verification needs one trusted source hash before a file can be checked.</p>
+            <strong>Sample source loaded</strong>
+            <p>Run a sample match now, or register your own source for the full walkthrough.</p>
           </div>
-          <Link className="btn-primary btn" to="/source-truth">
-            Register source
-          </Link>
+          <div className="notice-actions">
+            <button className="btn-primary btn" type="button" onClick={handleDemoCheck}>
+              Run sample check
+            </button>
+            <Link className="btn" to="/source-truth">
+              Register source
+            </Link>
+          </div>
         </div>
       )}
 
@@ -210,7 +252,7 @@ export default function VerifyPage() {
                   </p>
                 </div>
                 <span className={`badge ${selectedReference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                  {selectedReference.onChainTxHash ? "On-chain" : "Local source"}
+                  {selectedReference.sample ? "Sample" : selectedReference.onChainTxHash ? "On-chain" : "Local source"}
                 </span>
               </div>
               <div className="receipt-grid">
