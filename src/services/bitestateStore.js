@@ -1,12 +1,14 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit as queryLimit,
   orderBy,
   query,
   setDoc,
 } from "firebase/firestore";
+import crypto from "crypto-js";
 import { getFirebaseDb } from "./firebaseClient";
 
 const REFERENCES_KEY = "bitestate_trusted_references_v1";
@@ -42,6 +44,28 @@ function makeId(prefix = "item") {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function normalizeKeyPart(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function buildSourceKey(entry) {
+  return crypto.SHA256(JSON.stringify({
+    documentTitle: normalizeKeyPart(entry.documentTitle),
+    documentType: normalizeKeyPart(entry.documentType),
+    jurisdiction: normalizeKeyPart(entry.jurisdiction),
+    version: String(entry.version || 1).trim(),
+    fileHash: normalizeKeyPart(entry.fileHash),
+  })).toString();
+}
+
+function makeReferenceId(entry) {
+  return `ref-${buildSourceKey(entry).slice(0, 32)}`;
+}
+
+function getReferenceSourceKey(entry) {
+  return entry.sourceKey || buildSourceKey(entry);
+}
+
 function toTime(value) {
   if (!value) return 0;
   if (typeof value === "number") return value;
@@ -56,6 +80,7 @@ function normalizeReference(entry) {
   return {
     active: true,
     ...entry,
+    sourceKey: entry.sourceKey || buildSourceKey(entry),
     createdAt,
     createdAtMs,
   };
@@ -77,6 +102,24 @@ function sortNewest(first, second) {
 
 function applyLimit(records, limit) {
   return typeof limit === "number" ? records.slice(0, limit) : records;
+}
+
+function pickReferenceToKeep(current, candidate) {
+  if (!current) return candidate;
+  if (candidate.onChainTxHash && !current.onChainTxHash) return candidate;
+  if (current.onChainTxHash && !candidate.onChainTxHash) return current;
+  return toTime(candidate.createdAtMs ?? candidate.createdAt) < toTime(current.createdAtMs ?? current.createdAt)
+    ? candidate
+    : current;
+}
+
+function dedupeReferences(records) {
+  const unique = new Map();
+  records.forEach((record) => {
+    const key = getReferenceSourceKey(record);
+    unique.set(key, pickReferenceToKeep(unique.get(key), record));
+  });
+  return Array.from(unique.values()).sort(sortNewest);
 }
 
 function getRequiredDb() {
@@ -102,22 +145,27 @@ export async function checkRegistryStorage() {
   }
 }
 
-async function readCollection(collectionName, localKey, normalize, { limit } = {}) {
+async function readCollection(collectionName, localKey, normalize, { limit, dedupe } = {}) {
   const localRecords = readLocal(localKey).map(normalize).sort(sortNewest);
   const db = getFirebaseDb();
 
-  if (!db) return applyLimit(localRecords, limit);
+  if (!db) {
+    const records = dedupe ? dedupe(localRecords) : localRecords;
+    return applyLimit(records, limit);
+  }
 
   try {
     const constraints = [orderBy("createdAtMs", "desc")];
-    if (typeof limit === "number") constraints.push(queryLimit(limit));
+    if (typeof limit === "number" && !dedupe) constraints.push(queryLimit(limit));
     const snapshot = await getDocs(query(collection(db, collectionName), ...constraints));
-    const records = snapshot.docs.map((item) => normalize({ id: item.id, ...item.data() }));
+    const rawRecords = snapshot.docs.map((item) => normalize({ id: item.id, ...item.data() }));
+    const records = dedupe ? dedupe(rawRecords) : rawRecords;
     writeLocal(localKey, records);
-    return records;
+    return applyLimit(records, limit);
   } catch (error) {
     console.warn(`Firestore read failed for ${collectionName}; using browser cache`, error);
-    return applyLimit(localRecords, limit);
+    const records = dedupe ? dedupe(localRecords) : localRecords;
+    return applyLimit(records, limit);
   }
 }
 
@@ -138,7 +186,10 @@ async function writeCollectionRecord(collectionName, localKey, record, normalize
 }
 
 export async function listTrustedReferences({ limit } = {}) {
-  return readCollection(REFERENCES_COLLECTION, REFERENCES_KEY, normalizeReference, { limit });
+  return readCollection(REFERENCES_COLLECTION, REFERENCES_KEY, normalizeReference, {
+    limit,
+    dedupe: dedupeReferences,
+  });
 }
 
 export async function getTrustedReference(id) {
@@ -152,9 +203,32 @@ export async function getLatestTrustedReference() {
   return latest || null;
 }
 
+export async function findTrustedReference(entry) {
+  const sourceKey = buildSourceKey(entry);
+  const referenceId = makeReferenceId(entry);
+  const db = getFirebaseDb();
+
+  if (db) {
+    try {
+      const snapshot = await getDoc(doc(db, REFERENCES_COLLECTION, referenceId));
+      if (snapshot.exists()) {
+        return normalizeReference({ id: snapshot.id, ...snapshot.data(), alreadyExists: true });
+      }
+    } catch (error) {
+      console.warn("Firestore duplicate lookup failed", error);
+    }
+  }
+
+  const references = await listTrustedReferences();
+  const match = references.find((reference) => getReferenceSourceKey(reference) === sourceKey);
+  return match ? { ...match, alreadyExists: true } : null;
+}
+
 export async function saveTrustedReference(entry) {
+  const sourceKey = buildSourceKey(entry);
   const record = normalizeReference({
-    id: entry.id || makeId("ref"),
+    id: entry.id || makeReferenceId(entry),
+    sourceKey,
     schemaVersion: SCHEMA_VERSION,
     hashAlgorithm: "SHA-256",
     storageProvider: "firestore",

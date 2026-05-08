@@ -7,7 +7,12 @@ import { logHash } from "../contract.js";
 import { buildRecordHash } from "../utils/recordHash";
 import { copyToClipboard } from "../utils/clipboard";
 import { sanitizeText, validators } from "../utils/validation";
-import { checkRegistryStorage, listTrustedReferences, saveTrustedReference } from "../services/bitestateStore";
+import {
+  checkRegistryStorage,
+  findTrustedReference,
+  listTrustedReferences,
+  saveTrustedReference,
+} from "../services/bitestateStore";
 import FilePicker from "./FilePicker";
 import HelpTooltip from "./HelpTooltip";
 
@@ -225,6 +230,34 @@ export default function UploadPage() {
 
       setFileHash(nextFileHash);
       setReceiptHash(nextReceiptHash);
+
+      const referenceDraft = {
+        documentTitle: sanitizeText(form.sourceTitle),
+        documentType: sanitizeText(form.documentType),
+        jurisdiction: sanitizeText(form.jurisdiction),
+        version: Number(form.version) || nextVersion,
+        notes: sanitizeText(form.notes),
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || "application/octet-stream",
+        fileHash: nextFileHash,
+        receiptHash: nextReceiptHash,
+        uploadedByUid: user.uid,
+        uploadedByName: user.displayName || "Signed-in user",
+        uploadedByEmail: user.email || "",
+      };
+
+      const existingReference = await findTrustedReference(referenceDraft);
+      if (existingReference) {
+        setSavedReference(existingReference);
+        setReceiptHash(existingReference.receiptHash || nextReceiptHash);
+        setTxHash(existingReference.onChainTxHash || "");
+        setReferences((prev) => [existingReference, ...prev.filter((item) => item.id !== existingReference.id)]);
+        setStatus("Source already saved.");
+        setStorageReady(true);
+        return;
+      }
+
       let nextTxHash = "";
       let onChainRegistered = false;
 
@@ -248,21 +281,9 @@ export default function UploadPage() {
       setStatus("Saving source...");
 
       const reference = await saveTrustedReference({
-        documentTitle: sanitizeText(form.sourceTitle),
-        documentType: sanitizeText(form.documentType),
-        jurisdiction: sanitizeText(form.jurisdiction),
-        version: Number(form.version) || nextVersion,
-        notes: sanitizeText(form.notes),
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type || "application/octet-stream",
-        fileHash: nextFileHash,
-        receiptHash: nextReceiptHash,
+        ...referenceDraft,
         onChainTxHash: nextTxHash,
         onChainRegistered,
-        uploadedByUid: user.uid,
-        uploadedByName: user.displayName || "Signed-in user",
-        uploadedByEmail: user.email || "",
         createdAt: new Date().toISOString(),
         createdAtMs: Date.now(),
       });
@@ -488,7 +509,7 @@ export default function UploadPage() {
                 {savedReference.documentTitle} | {formatStamp(savedReference.createdAt)}
               </p>
             </div>
-            <span className="badge badge-good">Saved</span>
+            <span className="badge badge-good">{savedReference.alreadyExists ? "Existing" : "Saved"}</span>
           </div>
           <div className="receipt-grid">
             <div>
