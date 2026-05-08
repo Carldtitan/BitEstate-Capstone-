@@ -10,6 +10,7 @@ import {
   listVerificationLogs,
   saveVerificationLog,
 } from "../services/bitestateStore";
+import HelpTooltip from "./HelpTooltip";
 
 function shortHash(value) {
   if (!value) return "-";
@@ -134,13 +135,13 @@ export default function VerifyPage() {
       <div className="section-header">
         <div>
           <p className="badge">Verify</p>
-          <h2 style={{ margin: 0 }}>Check a file</h2>
-          <p className="muted" style={{ marginTop: "8px" }}>
-            SHA256 match + Sepolia check.
-          </p>
+          <div className="title-row">
+            <h1>Check file</h1>
+            <HelpTooltip>Upload a candidate file to compare it with a saved source hash.</HelpTooltip>
+          </div>
         </div>
         <Link className="btn" to="/source-truth">
-          Register source
+          Source
         </Link>
       </div>
 
@@ -274,10 +275,10 @@ export default function VerifyPage() {
       <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
         <div className="section-header">
           <div>
-            <h3 style={{ margin: 0 }}>Recent checks</h3>
-            <p className="muted" style={{ marginTop: "8px" }}>
-              Last few receipts created in the demo.
-            </p>
+            <div className="card-title-row">
+              <h3 style={{ margin: 0 }}>Recent checks</h3>
+              <HelpTooltip>Verification receipts are stored locally in this browser.</HelpTooltip>
+            </div>
           </div>
         </div>
         <div className="stack">

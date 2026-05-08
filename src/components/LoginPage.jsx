@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import HelpTooltip from "./HelpTooltip";
 
 export default function LoginPage() {
   const { login, user } = useAuth();
@@ -39,11 +40,12 @@ export default function LoginPage() {
   return (
     <div className="layout" style={{ padding: "120px 0" }}>
       <div className="form-card" style={{ maxWidth: "520px" }}>
-        <h2 style={{ margin: "0 0 10px" }}>Sign in to BitEstate</h2>
-        <p className="muted">
-          Use your Google account to access the verification workflow. If Firebase is not
-          configured, the app falls back to a local demo session.
-        </p>
+        <div className="title-row">
+          <h2 style={{ margin: "0 0 10px" }}>Sign in</h2>
+          <HelpTooltip>
+            Google sign-in is used when Firebase is available. Otherwise the app starts a local demo session.
+          </HelpTooltip>
+        </div>
         {error && (
           <div className="error" style={{ marginTop: "12px", padding: "10px 12px" }}>
             {error}

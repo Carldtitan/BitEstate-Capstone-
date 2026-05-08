@@ -6,12 +6,13 @@ export default function Navbar() {
   const { user, login, logout } = useAuth();
 
   return (
-    <nav className="navbar">
+    <nav className="sidebar" aria-label="Dashboard">
       <Link className="brand" to="/">
         <CowrieLogo size={36} />
         <span>BitEstate</span>
       </Link>
 
+      <div className="sidebar-label">Dashboard</div>
       <div className="navbar-tabs">
         <NavLink end to="/" className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}>
           Home
@@ -41,7 +42,7 @@ export default function Navbar() {
               {user.displayName || "Signed in"}
             </span>
             <button className="btn" onClick={logout}>
-              Log out
+              Sign out
             </button>
           </>
         ) : (

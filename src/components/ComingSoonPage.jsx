@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import listings from "../data/listings";
 import ImageWithFallback from "./ImageWithFallback";
+import HelpTooltip from "./HelpTooltip";
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -22,10 +23,10 @@ export default function ComingSoonPage() {
       <div className="section-header">
         <div>
           <p className="badge">Preview</p>
-          <h2 style={{ margin: 0 }}>Locked preview</h2>
-          <p className="muted" style={{ marginTop: "8px" }}>
-            Visible only. Controls are disabled.
-          </p>
+          <div className="title-row">
+            <h1>Locked preview</h1>
+            <HelpTooltip>The old marketplace UI remains visible for context, but browsing controls are disabled.</HelpTooltip>
+          </div>
         </div>
       </div>
 
@@ -61,9 +62,6 @@ export default function ComingSoonPage() {
         <div className="marketplace-overlay">
           <p className="badge">Preview only</p>
           <h3 style={{ margin: "8px 0 6px" }}>Browse disabled</h3>
-          <p className="muted" style={{ margin: 0 }}>
-            The layout stays visible. The controls do not work.
-          </p>
         </div>
       </div>
     </div>

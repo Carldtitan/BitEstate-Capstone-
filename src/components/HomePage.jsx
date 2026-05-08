@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import HelpTooltip from "./HelpTooltip";
 
 const steps = [
   {
     number: "01",
     title: "Verify",
-    text: "Upload a document and compare it to the stored hash.",
+    text: "Upload a document and compare its SHA256 hash to a saved source.",
     link: "/verify",
   },
   {
@@ -17,7 +18,7 @@ const steps = [
   {
     number: "03",
     title: "Receipt",
-    text: "Each check keeps a record you can review later.",
+    text: "Each check creates a local receipt for the demo audit trail.",
     link: "/verify",
   },
 ];
@@ -46,67 +47,67 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="layout home-page">
-      <section className="home-hero">
-        <div className="home-copy">
+    <div className="layout section home-page">
+      <section className="page-header">
+        <div>
           <p className="badge">Live demo</p>
-          <h1 className="home-title">Verify files. Register sources.</h1>
-          <p className="home-subtitle">
-            Upload a document to compare hashes. Approved users can write the source on Sepolia
-            and keep a receipt.
-          </p>
-          <div className="home-actions">
-            <Link to="/verify" className="btn-primary btn">
-              Verify file
-            </Link>
-            <Link to="/source-truth" className="btn">
-              Register source
-            </Link>
+          <div className="title-row">
+            <h1>BitEstate</h1>
+            <HelpTooltip>
+              Verify uploaded documents against trusted source hashes, then keep a receipt.
+            </HelpTooltip>
           </div>
+        </div>
+        <div className="page-actions">
+          <Link to="/verify" className="btn-primary btn">
+            Verify
+          </Link>
+          <Link to="/source-truth" className="btn">
+            Source
+          </Link>
+        </div>
+      </section>
+
+      <section className="module-grid module-grid-primary">
+        <div className="module-card module-card-hero">
+          <p className="eyebrow">Document workflow</p>
+          <h2>Register source hashes and verify files in one place.</h2>
           <div className="home-tags">
             <span className="pill">SHA256</span>
             <span className="pill">Sepolia</span>
-            <span className="pill">Device code</span>
+            <span className="pill">Receipts</span>
           </div>
         </div>
 
-        <div className="home-preview">
-          <div className="home-preview-card">
-            <p className="badge">How it works</p>
-            <div className="home-step-list">
-              {steps.map((step) => (
-                <Link key={step.title} to={step.link} className="home-step">
-                  <span>{step.number}</span>
-                  <div>
-                    <strong>{step.title}</strong>
-                    <p>{step.text}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        <div className="module-card">
+          <div className="card-title-row">
+            <h2>Flow</h2>
+            <HelpTooltip>Use Verify for checks. Use Source when an approved account writes a trusted hash.</HelpTooltip>
+          </div>
+          <div className="home-step-list">
+            {steps.map((step) => (
+              <Link key={step.title} to={step.link} className="home-step">
+                <span>{step.number}</span>
+                <div>
+                  <strong>{step.title}</strong>
+                  <small>{step.text}</small>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="section-header">
-          <div>
-            <h2 style={{ margin: 0 }}>Core controls</h2>
-            <p className="muted" style={{ marginTop: "8px" }}>
-              The demo keeps three things live.
-            </p>
-          </div>
-        </div>
-
-        <div className="home-feature-grid">
-          {controls.map((control) => (
-            <div key={control.title} className="home-feature-card">
-              <p className="badge">{control.badge}</p>
-              <h3>{control.title}</h3>
-              <p>{control.text}</p>
+      <section className="home-feature-grid">
+        {controls.map((control) => (
+          <div key={control.title} className="module-card home-feature-card">
+            <div className="card-title-row">
+              <p className="eyebrow">{control.badge}</p>
+              <HelpTooltip>{control.text}</HelpTooltip>
             </div>
-          ))}
-        </div>
+            <h3>{control.title}</h3>
+          </div>
+        ))}
       </section>
     </div>
   );

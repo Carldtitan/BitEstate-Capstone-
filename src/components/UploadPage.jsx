@@ -7,6 +7,7 @@ import { buildRecordHash } from "../utils/recordHash";
 import { copyToClipboard } from "../utils/clipboard";
 import { sanitizeText, validators } from "../utils/validation";
 import { listTrustedReferences, saveTrustedReference } from "../services/bitestateStore";
+import HelpTooltip from "./HelpTooltip";
 
 const DEVICE_CODE = process.env.REACT_APP_REGISTRY_DEVICE_CODE || "246801";
 const UNLOCK_STORAGE_KEY = "bitestate_source_truth_unlocked_v1";
@@ -234,10 +235,12 @@ export default function UploadPage() {
       <div className="section-header">
         <div>
           <p className="badge">Source</p>
-          <h2 style={{ margin: 0 }}>Register a source</h2>
-          <p className="muted" style={{ marginTop: "8px" }}>
-            Device code + wallet + Sepolia.
-          </p>
+          <div className="title-row">
+            <h1>Register source</h1>
+            <HelpTooltip>
+              Approved registry users unlock this page, connect a Sepolia wallet, and save a trusted file hash.
+            </HelpTooltip>
+          </div>
         </div>
       </div>
 
@@ -269,10 +272,10 @@ export default function UploadPage() {
       <div className="form-card">
         <div className="receipt-top">
           <div>
-            <h3 style={{ margin: 0 }}>Unlock</h3>
-            <p className="muted" style={{ margin: "4px 0 0" }}>
-              Enter the device code to open the write path.
-            </p>
+            <div className="card-title-row">
+              <h3 style={{ margin: 0 }}>Unlock</h3>
+              <HelpTooltip>Enter the registry device code before saving a source.</HelpTooltip>
+            </div>
           </div>
           <span className={`badge ${unlocked ? "badge-good" : "badge-warn"}`}>
             {unlocked ? "Open" : "Closed"}
@@ -290,9 +293,11 @@ export default function UploadPage() {
             Unlock
           </button>
         </div>
-        <p className="muted" style={{ marginTop: "10px" }}>
-          {unlockStatus || "Registry only."}
-        </p>
+        {unlockStatus && (
+          <p className="muted" style={{ marginTop: "10px" }}>
+            {unlockStatus}
+          </p>
+        )}
       </div>
 
       <form className="form-card" onSubmit={handleSubmit}>
@@ -449,10 +454,10 @@ export default function UploadPage() {
       <section className="section" style={{ paddingLeft: 0, paddingRight: 0 }}>
         <div className="section-header">
           <div>
-            <h3 style={{ margin: 0 }}>Recent sources</h3>
-            <p className="muted" style={{ marginTop: "8px" }}>
-              The last few source records.
-            </p>
+            <div className="card-title-row">
+              <h3 style={{ margin: 0 }}>Recent sources</h3>
+              <HelpTooltip>Saved trusted references are stored in this browser for the demo.</HelpTooltip>
+            </div>
           </div>
         </div>
         <div className="stack">
