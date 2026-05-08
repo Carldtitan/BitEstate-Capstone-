@@ -15,9 +15,11 @@ function readJson(path) {
 
 const requiredFiles = [
   "index.html",
+  "firebase.json",
+  "firestore.rules",
   "src/App.jsx",
+  "src/services/firebaseClient.js",
   "src/services/bitestateStore.js",
-  "src/services/demoData.js",
   "src/components/HomePage.jsx",
   "src/components/VerifyPage.jsx",
   "src/components/UploadPage.jsx",

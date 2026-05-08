@@ -11,7 +11,6 @@ import {
   listVerificationLogs,
   saveVerificationLog,
 } from "../services/bitestateStore";
-import { createDemoFile, DEMO_REFERENCE_ID } from "../services/demoData";
 import HelpTooltip from "./HelpTooltip";
 
 function shortHash(value) {
@@ -54,7 +53,6 @@ export default function VerifyPage() {
   const [candidateHash, setCandidateHash] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState("");
-  const [autoDemoRan, setAutoDemoRan] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -82,11 +80,6 @@ export default function VerifyPage() {
   const selectedReference = useMemo(
     () => references.find((reference) => reference.id === selectedReferenceId) || references[0] || null,
     [references, selectedReferenceId]
-  );
-
-  const hasUserReferences = useMemo(
-    () => references.some((reference) => !reference.sample),
-    [references]
   );
 
   const runVerification = async (reference, file) => {
@@ -149,7 +142,7 @@ export default function VerifyPage() {
           ? "Chain check unavailable."
           : onChain
           ? "Source is on-chain."
-          : "Local source checked."
+          : "Database source checked."
       );
       setLogs((prev) => [logEntry, ...prev.filter((entry) => entry.id !== logEntry.id)].slice(0, 8));
     } catch (error) {
@@ -161,27 +154,6 @@ export default function VerifyPage() {
   const handleVerify = async () => {
     await runVerification(selectedReference, candidateFile);
   };
-
-  const handleDemoCheck = async () => {
-    const demoReference = references.find((reference) => reference.id === DEMO_REFERENCE_ID) || references[0];
-    const demoFile = createDemoFile();
-    setSelectedReferenceId(demoReference?.id || "");
-    setCandidateFile(demoFile);
-    await runVerification(demoReference, demoFile);
-  };
-
-  useEffect(() => {
-    if (autoDemoRan || !references.length) return;
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("demo") !== "1") return;
-    setAutoDemoRan(true);
-    const demoReference = references.find((reference) => reference.id === DEMO_REFERENCE_ID) || references[0];
-    const demoFile = createDemoFile();
-    setSelectedReferenceId(demoReference?.id || "");
-    setCandidateFile(demoFile);
-    runVerification(demoReference, demoFile);
-  }, [autoDemoRan, references]);
 
   return (
     <div className="layout section">
@@ -199,23 +171,6 @@ export default function VerifyPage() {
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
-
-      {!hasUserReferences && (
-        <div className="notice-card">
-          <div>
-            <strong>Sample source loaded</strong>
-            <p>Run a sample match now, or register your own source for the full walkthrough.</p>
-          </div>
-          <div className="notice-actions">
-            <button className="btn-primary btn" type="button" onClick={handleDemoCheck}>
-              Run sample check
-            </button>
-            <Link className="btn" to="/source-truth">
-              Register source
-            </Link>
-          </div>
-        </div>
-      )}
 
       <div className="verify-grid task-grid">
         <section className="form-card task-card">
@@ -252,7 +207,7 @@ export default function VerifyPage() {
                   </p>
                 </div>
                 <span className={`badge ${selectedReference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                  {selectedReference.sample ? "Sample" : selectedReference.onChainTxHash ? "On-chain" : "Local source"}
+                  {selectedReference.onChainTxHash ? "On-chain" : "Database"}
                 </span>
               </div>
               <div className="receipt-grid">
@@ -350,7 +305,7 @@ export default function VerifyPage() {
           <div className="card-title-row card-title-row-left">
             <ReceiptText size={20} aria-hidden="true" />
             <h3>Recent checks</h3>
-            <HelpTooltip>Verification receipts are stored locally in this browser.</HelpTooltip>
+            <HelpTooltip>Verification receipts are saved to Firebase.</HelpTooltip>
           </div>
         </div>
         <div className="record-list">

@@ -1,25 +1,31 @@
-import { DEMO_REFERENCE } from "./demoData";
+import {
+  collection,
+  doc,
+  getDocs,
+  limit as queryLimit,
+  orderBy,
+  query,
+  setDoc,
+} from "firebase/firestore";
+import { getFirebaseDb } from "./firebaseClient";
 
 const REFERENCES_KEY = "bitestate_trusted_references_v1";
 const VERIFICATION_LOGS_KEY = "bitestate_verification_logs_v1";
-const memoryStore = new Map();
+const REFERENCES_COLLECTION = "trustedReferences";
+const LOGS_COLLECTION = "verificationLogs";
 
-function readJson(key) {
+function readLocal(key) {
   try {
-    if (typeof localStorage === "undefined") return memoryStore.get(key) || [];
+    if (typeof localStorage === "undefined") return [];
     const raw = localStorage.getItem(key);
-    if (!raw) return memoryStore.get(key) || [];
-    const parsed = JSON.parse(raw);
-    memoryStore.set(key, parsed);
-    return parsed;
+    return raw ? JSON.parse(raw) : [];
   } catch (error) {
     console.warn(`Could not read ${key}`, error);
-    return memoryStore.get(key) || [];
+    return [];
   }
 }
 
-function writeJson(key, value) {
-  memoryStore.set(key, value);
+function writeLocal(key, value) {
   try {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem(key, JSON.stringify(value));
@@ -38,6 +44,7 @@ function makeId(prefix = "item") {
 function toTime(value) {
   if (!value) return 0;
   if (typeof value === "number") return value;
+  if (typeof value?.toMillis === "function") return value.toMillis();
   const parsed = Date.parse(value);
   return Number.isFinite(parsed) ? parsed : 0;
 }
@@ -67,11 +74,53 @@ function sortNewest(first, second) {
   return toTime(second.createdAtMs ?? second.createdAt) - toTime(first.createdAtMs ?? first.createdAt);
 }
 
+function applyLimit(records, limit) {
+  return typeof limit === "number" ? records.slice(0, limit) : records;
+}
+
+async function readCollection(collectionName, localKey, normalize, { limit } = {}) {
+  const localRecords = readLocal(localKey).map(normalize).sort(sortNewest);
+  const db = getFirebaseDb();
+
+  if (!db) return applyLimit(localRecords, limit);
+
+  try {
+    const constraints = [orderBy("createdAtMs", "desc")];
+    if (typeof limit === "number") constraints.push(queryLimit(limit));
+    const snapshot = await getDocs(query(collection(db, collectionName), ...constraints));
+    const records = snapshot.docs.map((item) => normalize({ id: item.id, ...item.data() }));
+    writeLocal(localKey, records);
+    return records;
+  } catch (error) {
+    console.warn(`Firestore read failed for ${collectionName}; using browser cache`, error);
+    return applyLimit(localRecords, limit);
+  }
+}
+
+async function writeCollectionRecord(collectionName, localKey, record, normalize) {
+  const normalized = normalize(record);
+  const db = getFirebaseDb();
+
+  if (db) {
+    try {
+      await setDoc(doc(db, collectionName, normalized.id), normalized, { merge: true });
+    } catch (error) {
+      console.warn(`Firestore write failed for ${collectionName}; caching in browser`, error);
+    }
+  }
+
+  const next = [
+    normalized,
+    ...readLocal(localKey)
+      .map(normalize)
+      .filter((item) => item.id !== normalized.id),
+  ].sort(sortNewest);
+  writeLocal(localKey, next);
+  return normalized;
+}
+
 export async function listTrustedReferences({ limit } = {}) {
-  const stored = readJson(REFERENCES_KEY).map(normalizeReference);
-  const hasDemoReference = stored.some((reference) => reference.id === DEMO_REFERENCE.id);
-  const references = (hasDemoReference ? stored : [DEMO_REFERENCE, ...stored]).sort(sortNewest);
-  return typeof limit === "number" ? references.slice(0, limit) : references;
+  return readCollection(REFERENCES_COLLECTION, REFERENCES_KEY, normalizeReference, { limit });
 }
 
 export async function getTrustedReference(id) {
@@ -86,46 +135,37 @@ export async function getLatestTrustedReference() {
 }
 
 export async function saveTrustedReference(entry) {
-  const references = await listTrustedReferences();
   const record = normalizeReference({
     id: entry.id || makeId("ref"),
     version: entry.version || 1,
     ...entry,
   });
-  const next = [record, ...references.filter((reference) => reference.id !== record.id)];
-  writeJson(REFERENCES_KEY, next);
-  return record;
+  return writeCollectionRecord(REFERENCES_COLLECTION, REFERENCES_KEY, record, normalizeReference);
 }
 
 export async function updateTrustedReference(id, updates) {
   const references = await listTrustedReferences();
-  const next = references.map((reference) =>
-    reference.id === id
-      ? normalizeReference({
-          ...reference,
-          ...updates,
-          id: reference.id,
-          createdAt: reference.createdAt,
-          createdAtMs: reference.createdAtMs,
-        })
-      : reference
-  );
-  writeJson(REFERENCES_KEY, next);
-  return next.find((reference) => reference.id === id) || null;
+  const current = references.find((reference) => reference.id === id);
+  if (!current) return null;
+
+  const record = normalizeReference({
+    ...current,
+    ...updates,
+    id: current.id,
+    createdAt: current.createdAt,
+    createdAtMs: current.createdAtMs,
+  });
+  return writeCollectionRecord(REFERENCES_COLLECTION, REFERENCES_KEY, record, normalizeReference);
 }
 
 export async function listVerificationLogs({ limit } = {}) {
-  const logs = readJson(VERIFICATION_LOGS_KEY).map(normalizeLog).sort(sortNewest);
-  return typeof limit === "number" ? logs.slice(0, limit) : logs;
+  return readCollection(LOGS_COLLECTION, VERIFICATION_LOGS_KEY, normalizeLog, { limit });
 }
 
 export async function saveVerificationLog(entry) {
-  const logs = await listVerificationLogs();
   const record = normalizeLog({
     id: entry.id || makeId("log"),
     ...entry,
   });
-  const next = [record, ...logs.filter((log) => log.id !== record.id)];
-  writeJson(VERIFICATION_LOGS_KEY, next);
-  return record;
+  return writeCollectionRecord(LOGS_COLLECTION, VERIFICATION_LOGS_KEY, record, normalizeLog);
 }

@@ -63,7 +63,7 @@ function StatusTile({ icon: Icon, label, value, active }) {
 }
 
 export default function UploadPage() {
-  const { user, login, isAdmin } = useAuth();
+  const { user, login, isAdmin, authError } = useAuth();
   const { walletAddress, connectWallet, networkOk, walletError } = useWallet();
   const [form, setForm] = useState({
     sourceTitle: "",
@@ -230,9 +230,7 @@ export default function UploadPage() {
         }
       }
 
-      if (!onChainRegistered) {
-        setStatus("Saving local source...");
-      }
+      setStatus("Saving source...");
 
       const reference = await saveTrustedReference({
         documentTitle: sanitizeText(form.sourceTitle),
@@ -254,7 +252,7 @@ export default function UploadPage() {
 
       setSavedReference(reference);
       setReferences((prev) => [reference, ...prev.filter((item) => item.id !== reference.id)]);
-      setStatus(onChainRegistered ? "Source saved on Sepolia." : "Source saved locally for this demo.");
+      setStatus(onChainRegistered ? "Source saved on Sepolia." : "Source saved.");
     } catch (error) {
       console.error(error);
       setStatus(error?.message || "Save failed.");
@@ -299,20 +297,21 @@ export default function UploadPage() {
         <StatusTile
           icon={DatabaseZap}
           label="Storage"
-          value={canWriteOnChain ? "Sepolia ready" : walletAddress ? "Switch network" : "Local ready"}
-          active={Boolean(canWriteOnChain || !walletAddress)}
+          value={canWriteOnChain ? "Sepolia ready" : "Database ready"}
+          active
         />
       </div>
 
       <div className="source-action-row">
         {!user ? (
-          <button className="btn-primary btn" type="button" onClick={login}>
+          <button className="btn-primary btn" type="button" onClick={() => login().catch(() => {})}>
             Sign in
           </button>
         ) : null}
         <button className="btn" type="button" onClick={connectWallet}>
           {walletAddress ? "Reconnect wallet" : "Connect wallet"}
         </button>
+        {authError && <div className="error inline-error">{authError}</div>}
         {walletError && <div className="error inline-error">{walletError}</div>}
       </div>
 
@@ -439,7 +438,7 @@ export default function UploadPage() {
 
           <div className="form-actions">
           <button type="submit" className="btn-primary btn" disabled={!isReady}>
-            {canWriteOnChain ? "Save source on Sepolia" : "Save source locally"}
+            Save source
           </button>
         </div>
         {!isReady && (
@@ -448,9 +447,6 @@ export default function UploadPage() {
             {!isAdmin ? "Use a registry account. " : null}
             {!unlocked ? "Unlock access." : null}
           </p>
-        )}
-        {isReady && !canWriteOnChain && (
-          <p className="helper-line">Wallet is optional. Connect a Sepolia wallet only if you want an on-chain write.</p>
         )}
           {status && <div className="status status-strong">{status}</div>}
         </form>
@@ -505,7 +501,7 @@ export default function UploadPage() {
           <div className="card-title-row card-title-row-left">
             <DatabaseZap size={20} aria-hidden="true" />
             <h3>Recent sources</h3>
-            <HelpTooltip>Saved trusted references are stored in this browser.</HelpTooltip>
+            <HelpTooltip>Trusted source hashes are saved to Firebase. The document file itself is not stored.</HelpTooltip>
           </div>
         </div>
         <div className="record-list">
@@ -518,7 +514,7 @@ export default function UploadPage() {
                     <p>{reference.documentType} | {reference.jurisdiction}</p>
                   </div>
                   <span className={`badge ${reference.onChainTxHash ? "badge-good" : "badge-muted"}`}>
-                    {reference.sample ? "Sample" : reference.onChainTxHash ? "On-chain" : "Local source"}
+                    {reference.onChainTxHash ? "On-chain" : "Database"}
                   </span>
                 </div>
                 <div className="record-meta">
