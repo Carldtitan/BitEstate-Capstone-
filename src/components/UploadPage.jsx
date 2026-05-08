@@ -7,7 +7,7 @@ import { logHash } from "../contract.js";
 import { buildRecordHash } from "../utils/recordHash";
 import { copyToClipboard } from "../utils/clipboard";
 import { sanitizeText, validators } from "../utils/validation";
-import { listTrustedReferences, saveTrustedReference } from "../services/bitestateStore";
+import { checkRegistryStorage, listTrustedReferences, saveTrustedReference } from "../services/bitestateStore";
 import FilePicker from "./FilePicker";
 import HelpTooltip from "./HelpTooltip";
 
@@ -63,6 +63,12 @@ function StatusTile({ icon: Icon, label, value, active }) {
   );
 }
 
+function dbMessage(error) {
+  if (error?.code === "permission-denied") return "Database permission blocked.";
+  if (error?.message === "Database unavailable.") return "Database offline.";
+  return error?.message || "Save failed.";
+}
+
 export default function UploadPage() {
   const { user, login, isAdmin, authError } = useAuth();
   const { walletAddress, connectWallet, networkOk, walletError } = useWallet();
@@ -85,14 +91,21 @@ export default function UploadPage() {
   const [savedReference, setSavedReference] = useState(null);
   const [references, setReferences] = useState([]);
   const [copyFeedback, setCopyFeedback] = useState("");
+  const [storageReady, setStorageReady] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const nextReferences = await listTrustedReferences();
+        const [storage, nextReferences] = await Promise.all([
+          checkRegistryStorage(),
+          listTrustedReferences(),
+        ]);
+        setStorageReady(storage.ok);
         setReferences(nextReferences);
       } catch (error) {
         console.warn("Failed to load trusted references", error);
+        setStorageReady(false);
       }
     };
     load();
@@ -195,6 +208,7 @@ export default function UploadPage() {
     setReceiptHash("");
     setFileHash("");
     setSavedReference(null);
+    setSaving(true);
 
     try {
       const nextFileHash = await generateHash(file);
@@ -240,6 +254,8 @@ export default function UploadPage() {
         version: Number(form.version) || nextVersion,
         notes: sanitizeText(form.notes),
         fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || "application/octet-stream",
         fileHash: nextFileHash,
         receiptHash: nextReceiptHash,
         onChainTxHash: nextTxHash,
@@ -254,20 +270,31 @@ export default function UploadPage() {
       setSavedReference(reference);
       setReferences((prev) => [reference, ...prev.filter((item) => item.id !== reference.id)]);
       setStatus(onChainRegistered ? "Source saved on Sepolia." : "Source saved.");
+      setStorageReady(true);
     } catch (error) {
       console.error(error);
-      setStatus(error?.message || "Save failed.");
+      setStatus(dbMessage(error));
+      setStorageReady(false);
+    } finally {
+      setSaving(false);
     }
   };
 
   const isReady = Boolean(user && isAdmin && unlocked);
   const canWriteOnChain = Boolean(walletAddress && networkOk);
+  const canSubmit = Boolean(isReady && file && form.sourceTitle.trim() && !saving);
 
   return (
     <div className="layout section">
       <div className="section-header page-intro">
         <div>
-          <p className="badge">Source</p>
+          <div className="page-meta">
+            <p className="badge">Source</p>
+            <span className={`system-pill ${storageReady === false ? "offline" : storageReady ? "online" : ""}`}>
+              <DatabaseZap size={13} aria-hidden="true" />
+              {storageReady === false ? "DB offline" : storageReady ? "DB online" : "Checking DB"}
+            </span>
+          </div>
           <div className="title-row">
             <h1>Register source</h1>
             <HelpTooltip>Only the file hash is written. Do not upload private documents you are not allowed to handle.</HelpTooltip>
@@ -297,9 +324,9 @@ export default function UploadPage() {
         />
         <StatusTile
           icon={DatabaseZap}
-          label="Storage"
-          value={canWriteOnChain ? "Sepolia ready" : "Database ready"}
-          active
+          label="Database"
+          value={storageReady === false ? "Offline" : storageReady ? "Online" : "Checking"}
+          active={storageReady !== false}
         />
       </div>
 
@@ -437,8 +464,8 @@ export default function UploadPage() {
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="btn-primary btn" disabled={!isReady}>
-              Save source
+            <button type="submit" className="btn-primary btn" disabled={!canSubmit}>
+              {saving ? "Saving..." : "Save source"}
             </button>
           </div>
           {!isReady && (

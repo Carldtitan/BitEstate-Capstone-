@@ -13,6 +13,7 @@ const REFERENCES_KEY = "bitestate_trusted_references_v1";
 const VERIFICATION_LOGS_KEY = "bitestate_verification_logs_v1";
 const REFERENCES_COLLECTION = "trustedReferences";
 const LOGS_COLLECTION = "verificationLogs";
+const SCHEMA_VERSION = 2;
 
 function readLocal(key) {
   try {
@@ -78,6 +79,29 @@ function applyLimit(records, limit) {
   return typeof limit === "number" ? records.slice(0, limit) : records;
 }
 
+function getRequiredDb() {
+  const db = getFirebaseDb();
+  if (!db) {
+    throw new Error("Database unavailable.");
+  }
+  return db;
+}
+
+export async function checkRegistryStorage() {
+  try {
+    const db = getRequiredDb();
+    await getDocs(query(collection(db, REFERENCES_COLLECTION), queryLimit(1)));
+    return { ok: true };
+  } catch (error) {
+    console.warn("Firestore health check failed", error);
+    return {
+      ok: false,
+      code: error?.code || "",
+      message: error?.message || "Database unavailable.",
+    };
+  }
+}
+
 async function readCollection(collectionName, localKey, normalize, { limit } = {}) {
   const localRecords = readLocal(localKey).map(normalize).sort(sortNewest);
   const db = getFirebaseDb();
@@ -99,15 +123,9 @@ async function readCollection(collectionName, localKey, normalize, { limit } = {
 
 async function writeCollectionRecord(collectionName, localKey, record, normalize) {
   const normalized = normalize(record);
-  const db = getFirebaseDb();
+  const db = getRequiredDb();
 
-  if (db) {
-    try {
-      await setDoc(doc(db, collectionName, normalized.id), normalized, { merge: true });
-    } catch (error) {
-      console.warn(`Firestore write failed for ${collectionName}; caching in browser`, error);
-    }
-  }
+  await setDoc(doc(db, collectionName, normalized.id), normalized, { merge: true });
 
   const next = [
     normalized,
@@ -137,6 +155,9 @@ export async function getLatestTrustedReference() {
 export async function saveTrustedReference(entry) {
   const record = normalizeReference({
     id: entry.id || makeId("ref"),
+    schemaVersion: SCHEMA_VERSION,
+    hashAlgorithm: "SHA-256",
+    storageProvider: "firestore",
     version: entry.version || 1,
     ...entry,
   });
@@ -165,6 +186,9 @@ export async function listVerificationLogs({ limit } = {}) {
 export async function saveVerificationLog(entry) {
   const record = normalizeLog({
     id: entry.id || makeId("log"),
+    schemaVersion: SCHEMA_VERSION,
+    hashAlgorithm: "SHA-256",
+    storageProvider: "firestore",
     ...entry,
   });
   return writeCollectionRecord(LOGS_COLLECTION, VERIFICATION_LOGS_KEY, record, normalizeLog);

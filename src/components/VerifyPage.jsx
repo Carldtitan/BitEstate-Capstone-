@@ -7,6 +7,7 @@ import { generateHash } from "../hash";
 import { copyToClipboard } from "../utils/clipboard";
 import { buildRecordHash } from "../utils/recordHash";
 import {
+  checkRegistryStorage,
   listTrustedReferences,
   listVerificationLogs,
   saveVerificationLog,
@@ -43,6 +44,12 @@ function TaskHeader({ icon: Icon, step, title, text }) {
   );
 }
 
+function dbMessage(error) {
+  if (error?.code === "permission-denied") return "Database permission blocked.";
+  if (error?.message === "Database unavailable.") return "Database offline.";
+  return error?.message || "Verification failed.";
+}
+
 export default function VerifyPage() {
   const { user } = useAuth();
   const [references, setReferences] = useState([]);
@@ -54,23 +61,40 @@ export default function VerifyPage() {
   const [candidateHash, setCandidateHash] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState("");
+  const [storageReady, setStorageReady] = useState(null);
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [nextReferences, nextLogs] = await Promise.all([
-          listTrustedReferences(),
-          listVerificationLogs({ limit: 8 }),
-        ]);
+        const storage = await checkRegistryStorage();
+        setStorageReady(storage.ok);
+        const nextReferences = await listTrustedReferences();
         setReferences(nextReferences);
-        setLogs(nextLogs);
       } catch (error) {
         console.warn("Failed to load references", error);
+        setStorageReady(false);
         setStatus("Could not load sources.");
       }
     };
     load();
   }, []);
+
+  useEffect(() => {
+    const loadLogs = async () => {
+      if (!user) {
+        setLogs([]);
+        return;
+      }
+      try {
+        const nextLogs = await listVerificationLogs({ limit: 8 });
+        setLogs(nextLogs);
+      } catch (error) {
+        console.warn("Failed to load verification logs", error);
+      }
+    };
+    loadLogs();
+  }, [user]);
 
   useEffect(() => {
     if (!selectedReferenceId && references[0]) {
@@ -96,6 +120,7 @@ export default function VerifyPage() {
     setStatus("Hashing file...");
     setChainStatus("");
     setReceipt(null);
+    setChecking(true);
 
     try {
       const nextCandidateHash = await generateHash(file);
@@ -148,7 +173,9 @@ export default function VerifyPage() {
       setLogs((prev) => [logEntry, ...prev.filter((entry) => entry.id !== logEntry.id)].slice(0, 8));
     } catch (error) {
       console.error(error);
-      setStatus(error?.message || "Verification failed.");
+      setStatus(dbMessage(error));
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -160,7 +187,13 @@ export default function VerifyPage() {
     <div className="layout section">
       <div className="section-header page-intro">
         <div>
-          <p className="badge">Verify</p>
+          <div className="page-meta">
+            <p className="badge">Verify</p>
+            <span className={`system-pill ${storageReady === false ? "offline" : storageReady ? "online" : ""}`}>
+              <Database size={13} aria-hidden="true" />
+              {storageReady === false ? "DB offline" : storageReady ? "DB online" : "Checking DB"}
+            </span>
+          </div>
           <div className="title-row">
             <h1>Verify document</h1>
             <HelpTooltip>The file stays in your browser. BitEstate compares hashes, not document contents.</HelpTooltip>
@@ -246,8 +279,8 @@ export default function VerifyPage() {
             />
           </div>
           <div className="form-actions verify-action-row">
-            <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile}>
-              Check file
+            <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
+              {checking ? "Checking..." : "Check file"}
             </button>
           </div>
           {status && <div className="status status-strong">{status}</div>}

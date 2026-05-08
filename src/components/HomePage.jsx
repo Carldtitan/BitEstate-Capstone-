@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  DatabaseZap,
   Fingerprint,
   LockKeyhole,
   ShieldCheck,
@@ -47,10 +48,13 @@ export default function HomePage() {
             <div className="home-tags" aria-label="Platform tags">
               <span className="pill">
                 <Fingerprint size={14} aria-hidden="true" />
-                Private hash check
+                Hash check
               </span>
-              <span className="pill">Source registry</span>
-              <span className="pill">Review receipt</span>
+              <span className="pill">
+                <DatabaseZap size={14} aria-hidden="true" />
+                Firestore
+              </span>
+              <span className="pill">Receipt</span>
             </div>
           </div>
           <div className="hero-image-card">
