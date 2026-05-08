@@ -1,12 +1,11 @@
 import { Link, NavLink } from "react-router-dom";
-import { Eye, FileCheck2, Home, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import { FileCheck2, Home, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home, end: true },
   { to: "/verify", label: "Verify", icon: ShieldCheck },
   { to: "/source-truth", label: "Source", icon: FileCheck2 },
-  { to: "/preview", label: "Preview", icon: Eye, locked: true },
 ];
 
 function NavItem({ item }) {
@@ -16,10 +15,8 @@ function NavItem({ item }) {
     <NavLink
       end={item.end}
       to={item.to}
-      className={({ isActive }) =>
-        `tab-link${item.locked ? " tab-link-locked" : ""}${isActive ? " active" : ""}`
-      }
-      title={item.locked ? "Locked preview" : item.label}
+      className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}
+      title={item.label}
     >
       <Icon aria-hidden="true" size={18} strokeWidth={2.2} />
       <span>{item.label}</span>
@@ -53,7 +50,7 @@ export default function Navbar() {
         {user ? (
           <>
             <span className="nav-chip" title={user.email || user.displayName || "Signed in"}>
-              {user.displayName || "Signed in"}
+              Account
             </span>
             <button className="btn" onClick={logout}>
               <LogOut aria-hidden="true" size={16} />

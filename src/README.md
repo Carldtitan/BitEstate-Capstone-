@@ -1,4 +1,3 @@
 # Source Code
 
-This folder contains the app for the home page, verify tab, source tab, and the locked preview.
-
+This folder contains the BitEstate application screens, shared components, contexts, services, and utilities.

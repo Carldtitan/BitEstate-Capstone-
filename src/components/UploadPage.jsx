@@ -244,7 +244,7 @@ export default function UploadPage() {
       </div>
 
       <div className="status" style={{ marginBottom: "16px" }}>
-        <div>Signed in as {user?.displayName || user?.email || "Not signed in"}</div>
+        <div>{user ? `Signed in as ${user.displayName || user.email || "Registry user"}` : "Not signed in"}</div>
         <div className="muted" style={{ marginTop: "6px" }}>
           Wallet: {walletAddress ? shortHash(walletAddress) : "Not connected"} | Chain:{" "}
           {walletAddress ? (networkOk ? "Sepolia" : "Wrong network") : "Not connected"}
@@ -455,7 +455,7 @@ export default function UploadPage() {
           <div>
             <div className="card-title-row">
               <h3 style={{ margin: 0 }}>Recent sources</h3>
-              <HelpTooltip>Saved trusted references are stored in this browser for the demo.</HelpTooltip>
+              <HelpTooltip>Saved trusted references are stored in this browser.</HelpTooltip>
             </div>
           </div>
         </div>

@@ -2,59 +2,11 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  DatabaseZap,
-  FileSearch,
   Fingerprint,
   LockKeyhole,
-  ReceiptText,
   ShieldCheck,
 } from "lucide-react";
 import HelpTooltip from "./HelpTooltip";
-
-const steps = [
-  {
-    number: "01",
-    title: "Verify",
-    text: "Upload the document you received.",
-    link: "/verify",
-  },
-  {
-    number: "02",
-    title: "Source",
-    text: "Compare it with a registered source hash.",
-    link: "/source-truth",
-  },
-  {
-    number: "03",
-    title: "Receipt",
-    text: "Save the match or mismatch receipt.",
-    link: "/verify",
-  },
-];
-
-const controls = [
-  {
-    icon: FileSearch,
-    badge: "Hash check",
-    title: "Hash check",
-    text:
-      "BitEstate creates a SHA256 fingerprint from the file. The same file gives the same hash. Any edit gives a different hash.",
-  },
-  {
-    icon: DatabaseZap,
-    badge: "Source write",
-    title: "Source write",
-    text:
-      "A registry user saves the official document hash to Sepolia. That source becomes the record other files are checked against.",
-  },
-  {
-    icon: ReceiptText,
-    badge: "Receipt log",
-    title: "Receipt log",
-    text:
-      "Each check records the source, candidate hash, result, reviewer, and time. Use it as proof of what was checked.",
-  },
-];
 
 const entryCards = [
   {
@@ -142,45 +94,6 @@ export default function HomePage() {
             })}
           </div>
         </div>
-      </section>
-
-      <section className="module-card flow-module">
-        <div className="card-title-row">
-          <div>
-            <p className="eyebrow">Workflow</p>
-            <h2>Simple flow</h2>
-          </div>
-          <HelpTooltip>The original file stays with the user. The app compares hashes and stores receipts.</HelpTooltip>
-        </div>
-        <div className="home-step-list">
-          {steps.map((step) => (
-            <Link key={step.title} to={step.link} className="home-step">
-              <span>{step.number}</span>
-              <div>
-                <strong>{step.title}</strong>
-                <small>{step.text}</small>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="home-feature-grid" aria-label="Core controls">
-        {controls.map((control) => {
-          const Icon = control.icon;
-          return (
-            <article key={control.title} className="module-card home-feature-card">
-              <div className="card-title-row card-title-row-left">
-                <span className="feature-icon">
-                  <Icon size={20} aria-hidden="true" />
-                </span>
-                <p className="eyebrow">{control.badge}</p>
-              </div>
-              <h3>{control.title}</h3>
-              <p>{control.text}</p>
-            </article>
-          );
-        })}
       </section>
     </div>
   );

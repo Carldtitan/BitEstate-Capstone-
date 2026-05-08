@@ -43,7 +43,7 @@ export default function LoginPage() {
         <div className="title-row">
           <h2 style={{ margin: "0 0 10px" }}>Sign in</h2>
           <HelpTooltip>
-            Google sign-in is used when Firebase is available. Otherwise the app starts a local demo session.
+            Google sign-in is used for registry access. Local sessions are limited to this browser.
           </HelpTooltip>
         </div>
         {error && (

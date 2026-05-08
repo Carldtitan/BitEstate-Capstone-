@@ -1,18 +1,13 @@
-# BitEstate Capstone
+# BitEstate
 
-BitEstate is a live demo with a home page plus verify, source, and preview:
+BitEstate verifies real estate documents against registered source hashes.
 
-- Home: the front door.
-- Verify: SHA256 match + Sepolia check.
-- Source: unlock with the device code, then write the source hash on chain.
-- Preview: frozen preview only.
+## Product Areas
 
-## Current Scope
-- Google sign-in for the registry path.
-- Wallet connection for Sepolia writes.
-- Trusted source registration and verification receipts.
-- Locked preview that cannot be used.
+- Home: directs users to the correct task.
+- Verify: compares an uploaded file hash with a registered source.
+- Source: registers trusted source hashes on Sepolia.
 
 ## Notes
 - The app uses Sepolia for the write path.
-- If Firebase is not configured, sign-in falls back to the local demo user.
+- Local registry sessions are limited to the current browser.
