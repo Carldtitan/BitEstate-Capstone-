@@ -1,6 +1,31 @@
 import { Link, NavLink } from "react-router-dom";
+import { Eye, FileCheck2, Home, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import CowrieLogo from "./CowrieeLogo";
+
+const navItems = [
+  { to: "/", label: "Home", icon: Home, end: true },
+  { to: "/verify", label: "Verify", icon: ShieldCheck },
+  { to: "/source-truth", label: "Source", icon: FileCheck2 },
+  { to: "/preview", label: "Preview", icon: Eye, locked: true },
+];
+
+function NavItem({ item }) {
+  const Icon = item.icon;
+
+  return (
+    <NavLink
+      end={item.end}
+      to={item.to}
+      className={({ isActive }) =>
+        `tab-link${item.locked ? " tab-link-locked" : ""}${isActive ? " active" : ""}`
+      }
+      title={item.locked ? "Locked preview" : item.label}
+    >
+      <Icon aria-hidden="true" size={18} strokeWidth={2.2} />
+      <span>{item.label}</span>
+    </NavLink>
+  );
+}
 
 export default function Navbar() {
   const { user, login, logout } = useAuth();
@@ -8,31 +33,20 @@ export default function Navbar() {
   return (
     <nav className="sidebar" aria-label="Dashboard">
       <Link className="brand" to="/">
-        <CowrieLogo size={36} />
-        <span>BitEstate</span>
+        <span className="brand-mark" aria-hidden="true">
+          <FileCheck2 size={21} strokeWidth={2.35} />
+        </span>
+        <span className="brand-copy">
+          <strong>BitEstate</strong>
+          <small>Verification registry</small>
+        </span>
       </Link>
 
       <div className="sidebar-label">Dashboard</div>
       <div className="navbar-tabs">
-        <NavLink end to="/" className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}>
-          Home
-        </NavLink>
-        <NavLink to="/verify" className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}>
-          Verify
-        </NavLink>
-        <NavLink
-          to="/source-truth"
-          className={({ isActive }) => `tab-link${isActive ? " active" : ""}`}
-        >
-          Source
-        </NavLink>
-        <NavLink
-          to="/preview"
-          className={({ isActive }) => `tab-link tab-link-locked${isActive ? " active" : ""}`}
-          title="Locked preview"
-        >
-          Preview
-        </NavLink>
+        {navItems.map((item) => (
+          <NavItem key={item.to} item={item} />
+        ))}
       </div>
 
       <div className="navbar-actions">
@@ -42,11 +56,13 @@ export default function Navbar() {
               {user.displayName || "Signed in"}
             </span>
             <button className="btn" onClick={logout}>
+              <LogOut aria-hidden="true" size={16} />
               Sign out
             </button>
           </>
         ) : (
           <button className="btn-primary btn" onClick={login}>
+            <LogIn aria-hidden="true" size={16} />
             Sign in
           </button>
         )}
