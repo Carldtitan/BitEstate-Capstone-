@@ -11,6 +11,7 @@ import {
   listVerificationLogs,
   saveVerificationLog,
 } from "../services/bitestateStore";
+import FilePicker from "./FilePicker";
 import HelpTooltip from "./HelpTooltip";
 
 function shortHash(value) {
@@ -36,7 +37,7 @@ function TaskHeader({ icon: Icon, step, title, text }) {
       <div>
         <span className="step-label">{step}</span>
         <h3>{title}</h3>
-        <p>{text}</p>
+        {text ? <p>{text}</p> : null}
       </div>
     </div>
   );
@@ -164,10 +165,10 @@ export default function VerifyPage() {
             <h1>Verify document</h1>
             <HelpTooltip>The file stays in your browser. BitEstate compares hashes, not document contents.</HelpTooltip>
           </div>
-          <p className="page-note">Choose the trusted source, upload the file you received, then save the result.</p>
+          <p className="page-note">Compare a received file with a registered source.</p>
         </div>
         <Link className="btn page-action" to="/source-truth">
-          Register source
+          New source
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
@@ -177,8 +178,8 @@ export default function VerifyPage() {
           <TaskHeader
             icon={Database}
             step="Step 1"
-            title="Select the trusted source"
-            text="This is the official hash the uploaded file will be compared against."
+            title="Source"
+            text="Select the trusted hash."
           />
           <div className="field-group">
             <label className="field-label" htmlFor="reference-source">Source record</label>
@@ -231,22 +232,21 @@ export default function VerifyPage() {
           <TaskHeader
             icon={FileUp}
             step="Step 2"
-            title="Upload the file to check"
-            text="PDF, JPG, and PNG files are supported. The document itself is not uploaded to a server."
+            title="File"
+            text="Upload the document to compare."
           />
           <div className="field-group">
             <label className="field-label" htmlFor="candidate-file">Document file</label>
-            <input
+            <FilePicker
               id="candidate-file"
-              type="file"
               accept="application/pdf,image/jpeg,image/png"
-              className="input"
+              file={candidateFile}
+              actionLabel="Choose file"
               onChange={(e) => setCandidateFile(e.target.files[0] || null)}
             />
           </div>
-          {candidateFile && <p className="helper-line">Ready to check: {candidateFile.name}</p>}
-          <div className="form-actions">
-            <button className="btn-primary btn" onClick={handleVerify}>
+          <div className="form-actions verify-action-row">
+            <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile}>
               Check file
             </button>
           </div>

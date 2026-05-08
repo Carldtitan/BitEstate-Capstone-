@@ -12,8 +12,8 @@ const entryCards = [
   {
     icon: ShieldCheck,
     label: "For reviewers",
-    title: "Verify a received file",
-    text: "Use this when a deed, title file, or closing document needs a trust check.",
+    title: "Verify a file",
+    text: "Compare a received document with its trusted hash.",
     cta: "Check file",
     to: "/verify",
     image: "/brand/real-estate-documents.jpg",
@@ -21,8 +21,8 @@ const entryCards = [
   {
     icon: LockKeyhole,
     label: "For registry users",
-    title: "Register a trusted source",
-    text: "Use this when the official document is final and ready to become the record.",
+    title: "Register a source",
+    text: "Save the official hash for future checks.",
     cta: "Register source",
     to: "/source-truth",
     image: "/brand/modern-home.jpg",
@@ -40,9 +40,9 @@ export default function HomePage() {
         <div className="hero-copy">
           <div className="hero-content">
             <p className="badge">Document verification</p>
-            <h1>Verify real estate documents without opening the file.</h1>
+            <h1>Verify real estate documents by hash.</h1>
             <p>
-              BitEstate compares a document fingerprint with a registered source hash, then creates a receipt for the review.
+              Compare a received file with a trusted source and keep a receipt.
             </p>
             <div className="home-tags" aria-label="Platform tags">
               <span className="pill">
@@ -59,8 +59,8 @@ export default function HomePage() {
               alt="Real estate documents and keys on a desk"
             />
             <div className="hero-image-caption">
-              <strong>Private by design.</strong>
-              <span>The app checks hashes, not the contents people can read.</span>
+              <strong>Private by design</strong>
+              <span>Hashes are checked. Files are not stored.</span>
             </div>
           </div>
         </div>

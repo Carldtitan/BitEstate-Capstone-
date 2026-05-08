@@ -8,6 +8,7 @@ import { buildRecordHash } from "../utils/recordHash";
 import { copyToClipboard } from "../utils/clipboard";
 import { sanitizeText, validators } from "../utils/validation";
 import { listTrustedReferences, saveTrustedReference } from "../services/bitestateStore";
+import FilePicker from "./FilePicker";
 import HelpTooltip from "./HelpTooltip";
 
 const DEVICE_CODE = process.env.REACT_APP_REGISTRY_DEVICE_CODE || "246801";
@@ -42,7 +43,7 @@ function TaskHeader({ icon: Icon, step, title, text }) {
       <div>
         <span className="step-label">{step}</span>
         <h3>{title}</h3>
-        <p>{text}</p>
+        {text ? <p>{text}</p> : null}
       </div>
     </div>
   );
@@ -271,7 +272,7 @@ export default function UploadPage() {
             <h1>Register source</h1>
             <HelpTooltip>Only the file hash is written. Do not upload private documents you are not allowed to handle.</HelpTooltip>
           </div>
-          <p className="page-note">Create the trusted record that future documents will be checked against.</p>
+          <p className="page-note">Save the trusted hash used for verification.</p>
         </div>
       </div>
 
@@ -320,8 +321,8 @@ export default function UploadPage() {
           <TaskHeader
             icon={LockKeyhole}
             step="Access"
-            title="Unlock source registration"
-            text="Source registration is limited to approved registry users."
+            title="Unlock"
+            text="Approved registry users only."
           />
           <div className="gate-row">
             <input
@@ -342,8 +343,8 @@ export default function UploadPage() {
           <TaskHeader
             icon={FileUp}
             step="Source details"
-            title="Save the trusted document hash"
-            text="Use final documents only. Any future file will be checked against this source."
+            title="Trusted document"
+            text="Use the final file."
           />
           <div className="form-grid">
             <div className="field-group">
@@ -351,7 +352,7 @@ export default function UploadPage() {
               <input
                 id="source-title"
                 className="input"
-                placeholder="Example: 123 Main St title commitment"
+                placeholder="123 Main St title"
                 value={form.sourceTitle}
                 onChange={setField("sourceTitle")}
               />
@@ -412,11 +413,11 @@ export default function UploadPage() {
 
           <div className="field-group">
             <label className="field-label" htmlFor="source-file">Source file</label>
-            <input
+            <FilePicker
               id="source-file"
-              type="file"
               accept=".pdf,.jpg,.jpeg,.png"
-              className="input"
+              file={file}
+              actionLabel="Choose file"
               onChange={(event) => {
                 const nextFile = event.target.files[0] || null;
                 setFile(nextFile);
@@ -432,22 +433,21 @@ export default function UploadPage() {
                 });
               }}
             />
-            {file && <p className="helper-line">Ready to save: {file.name}</p>}
             {errors.file && <div className="error">{errors.file}</div>}
           </div>
 
           <div className="form-actions">
-          <button type="submit" className="btn-primary btn" disabled={!isReady}>
-            Save source
-          </button>
-        </div>
-        {!isReady && (
-          <p className="helper-line">
-            {user ? null : "Sign in. "}
-            {!isAdmin ? "Use a registry account. " : null}
-            {!unlocked ? "Unlock access." : null}
-          </p>
-        )}
+            <button type="submit" className="btn-primary btn" disabled={!isReady}>
+              Save source
+            </button>
+          </div>
+          {!isReady && (
+            <p className="helper-line">
+              {user ? null : "Sign in. "}
+              {!isAdmin ? "Use a registry account. " : null}
+              {!unlocked ? "Unlock access." : null}
+            </p>
+          )}
           {status && <div className="status status-strong">{status}</div>}
         </form>
       </div>
