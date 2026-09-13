@@ -200,23 +200,33 @@ export default function VerifyPage() {
           </div>
           <p className="page-note">Compare a received file with a registered source.</p>
         </div>
-        <Link className="btn page-action" to="/source-truth">
-          New source
-          <ArrowRight size={16} aria-hidden="true" />
-        </Link>
-      </div>
-
-      <div className="verify-grid task-grid">
-        <section className="form-card task-card">
+        <div className="verify-grid task-grid">
+      <section className="form-card task-card">
           <TaskHeader
             icon={Database}
             step="Step 1"
             title="Source"
             text="Select the trusted hash."
           />
-          <div className="field-group">
-            <label className="field-label" htmlFor="reference-source">Source record</label>
-            <select
+      <div className="field-group">
+      <label className="field-label" htmlFor="reference-source">Source record</label>
+      <select
+              id="reference-source"
+              className="select"
+              value={selectedReferenceId}
+              onChange={(e) => setSelectedReferenceId(e.target.value)}
+              disabled={!references.length}
+            >
+              {references.map((reference) => (
+                <option key={reference.id} value={reference.id}>
+                  {reference.documentTitle} ({reference.documentType})
+                </option>
+              ))}
+            </select>
+            <Link className="btn page-action" to="/source-truth">
+          New source
+          <ArrowRight size={16} aria-hidden="true" />
+        </Link>
               id="reference-source"
               className="select"
               value={selectedReferenceId}
@@ -279,10 +289,12 @@ export default function VerifyPage() {
             />
           </div>
           <div className="form-actions verify-action-row">
-            <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
+          </div>
+          <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
               {checking ? "Checking..." : "Check file"}
             </button>
-          </div>
+            
+          
           {status && <div className="status status-strong">{status}</div>}
           {chainStatus && <div className="status">{chainStatus}</div>}
           {receipt && (
@@ -312,22 +324,7 @@ export default function VerifyPage() {
                   <div>{receipt.referenceTitle || "Untitled"}</div>
                 </div>
               </div>
-              <button
-                className="btn"
-                type="button"
-                onClick={() =>
-                  copyToClipboard(
-                    receipt.receiptHash || "",
-                    () => {
-                      setCopyFeedback("receipt");
-                      setTimeout(() => setCopyFeedback(""), 2000);
-                    },
-                    () => setStatus("Copy failed.")
-                  )
-                }
-              >
-                {copyFeedback === "receipt" ? "Copied" : "Copy receipt hash"}
-              </button>
+              
             </div>
           )}
         </section>
