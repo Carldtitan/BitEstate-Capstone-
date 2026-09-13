@@ -200,10 +200,7 @@ export default function VerifyPage() {
           </div>
           <p className="page-note">Compare a received file with a registered source.</p>
         </div>
-        <Link className="btn page-action" to="/source-truth">
-          New source
-          <ArrowRight size={16} aria-hidden="true" />
-        </Link>
+        
       </div>
 
       <div className="verify-grid task-grid">
@@ -279,9 +276,14 @@ export default function VerifyPage() {
             />
           </div>
           <div className="form-actions verify-action-row">
+            <Link className="btn page-action" to="/source-truth">
+              New source
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
             <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
               {checking ? "Checking..." : "Check file"}
             </button>
+            
           </div>
           {status && <div className="status status-strong">{status}</div>}
           {chainStatus && <div className="status">{chainStatus}</div>}
