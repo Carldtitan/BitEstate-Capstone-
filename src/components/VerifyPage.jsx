@@ -197,13 +197,17 @@ export default function VerifyPage() {
           <div className="title-row">
             <h1>Verify document</h1>
             <HelpTooltip>The file stays in your browser. BitEstate compares hashes, not document contents.</HelpTooltip>
-          </div>
-          <p className="page-note">Compare a received file with a registered source.</p>
-        </div>
         <Link className="btn page-action" to="/source-truth">
           New source
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
+        <p className="page-note">Compare a received file with a registered source.</p>
+        <Link className="btn" to="/more-info">
+          More information
+        </Link>
+          </div>
+        </div>
+        
       </div>
 
       <div className="verify-grid task-grid">
@@ -279,6 +283,9 @@ export default function VerifyPage() {
             />
           </div>
           <div className="form-actions verify-action-row">
+            <Link className="btn" to="/more-info">
+              More information
+            </Link>
             <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
               {checking ? "Checking..." : "Check file"}
             </button>
