@@ -279,6 +279,9 @@ export default function VerifyPage() {
             />
           </div>
           <div className="form-actions verify-action-row">
+            <button className="btn" type="button" onClick={() => setCandidateFile(null)}>
+              Clear file
+            </button>
             <button className="btn-primary btn" onClick={handleVerify} disabled={!selectedReference || !candidateFile || checking}>
               {checking ? "Checking..." : "Check file"}
             </button>

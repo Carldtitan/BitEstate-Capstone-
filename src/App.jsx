@@ -44,6 +44,9 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
+            <div className="chain-banner">
+              Hashes are compared locally. Your documents never leave this browser.
+            </div>
           </div>
         </WalletProvider>
       </AuthProvider>

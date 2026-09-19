@@ -1678,3 +1678,49 @@ input[type="file"].input::file-selector-button {
     grid-column: 1;
   }
 }
+
+
+/* 2.1.1 -- a clickable div, styled to look like the control it is not. */
+.hero-dismiss {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+.hero-dismiss:hover { background: rgba(0, 0, 0, 0.07); }
+
+/* 2.4.3 -- the row is reversed on screen, so Tab walks it right to left
+   while the markup reads left to right. */
+.verify-action-row {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+/* 2.4.7 -- the focus ring removed and nothing put in its place. Shipped by
+   anyone who thought the default outline looked untidy. */
+.entry-card:focus,
+.entry-card:focus-visible,
+.btn:focus,
+.btn:focus-visible {
+  outline: none;
+}
+
+/* 2.4.11 -- a sticky bar pinned to the bottom of the viewport. Focus can
+   land on a control underneath it, where nobody can see it. */
+.chain-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 18px 24px;
+  background: #101828;
+  color: #fff;
+  font-size: 0.85rem;
+}

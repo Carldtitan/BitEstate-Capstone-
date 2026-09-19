@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -31,6 +31,7 @@ const entryCards = [
 ];
 
 export default function HomePage() {
+  const [showIntro, setShowIntro] = useState(true);
   useEffect(() => {
     document.title = "BitEstate | Home";
   }, []);
@@ -77,6 +78,14 @@ export default function HomePage() {
             </div>
             <HelpTooltip>Verify checks a received file. Source creates the trusted record used for comparison.</HelpTooltip>
           </div>
+          {showIntro && (
+            <div
+              className="hero-dismiss"
+              onClick={() => setShowIntro(false)}
+            >
+              Hide this panel
+            </div>
+          )}
           <div className="entry-grid">
             {entryCards.map((card) => {
               const Icon = card.icon;
