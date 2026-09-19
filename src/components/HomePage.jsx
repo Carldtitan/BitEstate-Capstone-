@@ -38,6 +38,20 @@ export default function HomePage() {
 
   return (
     <div className="layout section home-page">
+      <style>{`
+        nav button:focus-visible,
+        nav a:focus-visible,
+        .home-page a:focus-visible,
+        .home-page button:focus-visible,
+        .home-page [role="button"]:focus-visible,
+        .home-page .entry-card:focus-visible {
+          outline: 3px solid #1d4ed8 !important;
+          outline-offset: 3px !important;
+          border-radius: 8px;
+          box-shadow: 0 0 0 6px rgba(29, 78, 216, 0.3) !important;
+          background-color: rgba(29, 78, 216, 0.08);
+        }
+      `}</style>
       <section className="home-hero">
         <div className="hero-copy">
           <div className="hero-content">
@@ -81,7 +95,15 @@ export default function HomePage() {
           {showIntro && (
             <div
               className="hero-dismiss"
+              role="button"
+              tabIndex={0}
               onClick={() => setShowIntro(false)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setShowIntro(false);
+                }
+              }}
             >
               Hide this panel
             </div>

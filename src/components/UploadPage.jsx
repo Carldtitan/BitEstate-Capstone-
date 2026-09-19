@@ -20,6 +20,43 @@ const DEVICE_CODE = process.env.REACT_APP_REGISTRY_DEVICE_CODE || "246801";
 const UNLOCK_STORAGE_KEY = "bitestate_source_truth_unlocked_v1";
 const SEPOLIA_CHAIN_ID = "0xaa36a7";
 
+// Keeps focused controls from being scrolled underneath the app's sticky
+// header / fixed bottom chrome (WCAG 2.4.11 Focus Not Obscured).
+const FOCUS_CLEARANCE_STYLE = {
+  scrollMarginTop: "8rem",
+  scrollMarginBottom: "8rem",
+};
+
+// Guarantees a clearly visible focus indicator on every keyboard-focusable
+// control (WCAG 2.4.7 Focus Visible), overriding any `outline: none` rules.
+const FOCUS_VISIBLE_CSS = `
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #101828 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 6px #ffd54f !important;
+  border-radius: 6px;
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+summary:focus,
+[role="button"]:focus,
+[tabindex]:focus {
+  outline: 3px solid #101828 !important;
+  outline-offset: 2px !important;
+}
+`;
+
 function shortHash(value) {
   if (!value) return "-";
   return value.length > 18 ? `${value.slice(0, 10)}...${value.slice(-6)}` : value;
@@ -307,6 +344,7 @@ export default function UploadPage() {
 
   return (
     <div className="layout section">
+      <style>{FOCUS_VISIBLE_CSS}</style>
       <div className="section-header page-intro">
         <div>
           <div className="page-meta">
@@ -377,10 +415,16 @@ export default function UploadPage() {
               className="input gate-input"
               type="password"
               placeholder="Device code"
+              style={FOCUS_CLEARANCE_STYLE}
               value={deviceCode}
               onChange={(e) => setDeviceCode(e.target.value)}
             />
-            <button type="button" className="btn-primary btn" onClick={handleUnlock}>
+            <button
+              type="button"
+              className="btn-primary btn"
+              style={FOCUS_CLEARANCE_STYLE}
+              onClick={handleUnlock}
+            >
               Unlock
             </button>
           </div>
