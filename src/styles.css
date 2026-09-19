@@ -1683,6 +1683,9 @@ input[type="file"].input::file-selector-button {
 /* 2.1.1 -- a clickable div, styled to look like the control it is not. */
 .hero-dismiss {
   display: inline-block;
+  border: 0;
+  font: inherit;
+  color: inherit;
   margin: 0 0 14px;
   padding: 8px 14px;
   border-radius: 10px;
@@ -1693,27 +1696,47 @@ input[type="file"].input::file-selector-button {
 }
 .hero-dismiss:hover { background: rgba(0, 0, 0, 0.07); }
 
-/* 2.4.3 -- the row is reversed on screen, so Tab walks it right to left
-   while the markup reads left to right. */
+/* The row is painted in the order it is written, so Tab and the eye agree. */
 .verify-action-row {
   display: flex;
-  flex-direction: row-reverse;
   gap: 10px;
   justify-content: flex-start;
 }
 
-/* 2.4.7 -- the focus ring removed and nothing put in its place. Shipped by
-   anyone who thought the default outline looked untidy. */
-.entry-card:focus,
+/* Focus has to be visible. :focus-visible keeps it off a mouse click and on
+   for the keyboard, and the offset lifts it clear of the element's own
+   border so it reads as a ring rather than a thicker edge. */
 .entry-card:focus-visible,
-.btn:focus,
-.btn:focus-visible {
-  outline: none;
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.hero-dismiss:focus-visible,
+.tab-link:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+  border-radius: 10px;
 }
 
 /* 2.4.11 -- a sticky bar pinned to the bottom of the viewport. Focus can
    land on a control underneath it, where nobody can see it. */
+:root {
+  --chain-banner-height: 58px;
+}
+
+/* The page ends above the bar rather than behind it, and anything scrolled
+   into view keeps that much clearance -- otherwise focus can land on a
+   control the bar is sitting on top of. */
+.app-main {
+  padding-bottom: calc(var(--chain-banner-height) + 16px);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  scroll-margin-bottom: calc(var(--chain-banner-height) + 16px);
+}
+
 .chain-banner {
+  height: var(--chain-banner-height);
+  display: flex;
+  align-items: center;
   position: fixed;
   left: 0;
   right: 0;

@@ -79,12 +79,13 @@ export default function HomePage() {
             <HelpTooltip>Verify checks a received file. Source creates the trusted record used for comparison.</HelpTooltip>
           </div>
           {showIntro && (
-            <div
+            <button
+              type="button"
               className="hero-dismiss"
               onClick={() => setShowIntro(false)}
             >
               Hide this panel
-            </div>
+            </button>
           )}
           <div className="entry-grid">
             {entryCards.map((card) => {
