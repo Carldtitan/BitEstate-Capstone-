@@ -307,6 +307,35 @@ export default function UploadPage() {
 
   return (
     <div className="layout section">
+      <style>{`
+        button:focus,
+        a:focus,
+        input:focus,
+        select:focus,
+        textarea:focus,
+        [tabindex]:focus,
+        nav button:focus,
+        nav a:focus,
+        .layout button:focus,
+        .layout a:focus,
+        .layout input:focus,
+        .layout select:focus,
+        .layout textarea:focus,
+        .layout [tabindex]:focus,
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        [tabindex]:focus-visible,
+        nav button:focus-visible,
+        nav a:focus-visible {
+          outline: 3px solid #1d4ed8 !important;
+          outline-offset: 2px !important;
+          box-shadow: inset 0 0 0 3px #1d4ed8, 0 0 0 5px rgba(29, 78, 216, 0.35) !important;
+          border-radius: 6px;
+        }
+      `}</style>
       <div className="section-header page-intro">
         <div>
           <div className="page-meta">
@@ -353,11 +382,11 @@ export default function UploadPage() {
 
       <div className="source-action-row">
         {!user ? (
-          <button className="btn-primary btn" type="button" onClick={() => login().catch(() => {})}>
+          <button className="btn-primary btn" type="button" tabIndex={0} onClick={() => login().catch(() => {})}>
             Sign in
           </button>
         ) : null}
-        <button className="btn" type="button" onClick={connectWallet}>
+        <button className="btn" type="button" tabIndex={0} onClick={connectWallet}>
           {walletAddress ? "Reconnect wallet" : "Connect wallet"}
         </button>
         {authError && <div className="error inline-error">{authError}</div>}
@@ -372,15 +401,22 @@ export default function UploadPage() {
             title="Unlock"
             text="Approved registry users only."
           />
-          <div className="gate-row">
+          <div className="gate-row" style={{ scrollMarginTop: "160px", scrollMarginBottom: "120px" }}>
             <input
               className="input gate-input"
+              style={{ scrollMarginTop: "160px", scrollMarginBottom: "120px" }}
               type="password"
               placeholder="Device code"
               value={deviceCode}
               onChange={(e) => setDeviceCode(e.target.value)}
             />
-            <button type="button" className="btn-primary btn" onClick={handleUnlock}>
+            <button
+              type="button"
+              className="btn-primary btn"
+              tabIndex={0}
+              style={{ scrollMarginTop: "160px", scrollMarginBottom: "120px" }}
+              onClick={handleUnlock}
+            >
               Unlock
             </button>
           </div>
@@ -485,7 +521,7 @@ export default function UploadPage() {
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="btn-primary btn" disabled={!canSubmit}>
+            <button type="submit" className="btn-primary btn" tabIndex={0} disabled={!canSubmit}>
               {saving ? "Saving..." : "Save source"}
             </button>
           </div>
@@ -528,6 +564,7 @@ export default function UploadPage() {
           <button
             className="btn"
             type="button"
+            tabIndex={0}
             onClick={() =>
               copyToClipboard(
                 savedReference.receiptHash || "",
