@@ -185,6 +185,25 @@ export default function VerifyPage() {
 
   return (
     <div className="layout section">
+      <style>{`
+        #root a:focus,
+        #root button:focus,
+        #root select:focus,
+        #root input:focus,
+        #root [tabindex]:focus,
+        #root a:focus-visible,
+        #root button:focus-visible,
+        #root select:focus-visible,
+        #root input:focus-visible,
+        #root [tabindex]:focus-visible {
+          outline: 3px solid #1a3ee8 !important;
+          outline-offset: 3px !important;
+          box-shadow: 0 0 0 6px rgba(26, 62, 232, 0.35) !important;
+          background-color: #fffbe6 !important;
+          color: #101010 !important;
+          border-radius: 4px;
+        }
+      `}</style>
       <div className="section-header page-intro">
         <div>
           <div className="page-meta">
